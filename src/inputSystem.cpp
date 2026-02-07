@@ -36,7 +36,6 @@ void inputHandler(GLFWwindow* window) {
 		jumping = true;
 	}
 	else {
-		camPos.y = -1.0f;
 		moveVector.y = 0.0f;
 		jumping = false;
 	}
@@ -84,8 +83,8 @@ void mouseMovementCallback(GLFWwindow* window, double xPos, double yPos) {
 	offsetX *= mouseSensitivity * deltaTime;
 	offsetY *= mouseSensitivity * deltaTime;
 
-	yaw += offsetX;
-	pitch += offsetY;
+	yaw -= offsetX;
+	pitch -= offsetY;
 
 	camFront = glm::vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch));
 }

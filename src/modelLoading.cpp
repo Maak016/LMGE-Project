@@ -56,6 +56,7 @@ void Mesh::draw(shader& Shader, glm::mat4& modelMatrix) {
 		glBindTexture(GL_TEXTURE_2D, current.ID);
 		num.clear();
 	}
+	Shader.uniform("model", modelMatrix);
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

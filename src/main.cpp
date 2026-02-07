@@ -15,11 +15,9 @@ bool released = true;
 gameObject testingObject;
 void setup(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { {} });
+	testingObject.init(backpack, s, nullptr, nullptr, {});
 
-	testingObject.instantiate(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(30.0f, 20.0f, 1.0f));
-
-	allObjects.push_back(&testingObject);
+	testingObject.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 int main() {
@@ -45,8 +43,15 @@ int main() {
 	unsigned int matricesBlock;
 	glGenBuffers(1, &matricesBlock);
 	glBindBuffer(GL_UNIFORM_BUFFER, matricesBlock);
-	glBufferData(GL_UNIFORM_BUFFER, 128, nullptr, GL_STATIC_DRAW); 
+	glBufferData(GL_UNIFORM_BUFFER, 128, nullptr, GL_STATIC_DRAW);	//2 * matrix4 = 2 * (4 * 4N) = 32N = 128bytes
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, matricesBlock);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	unsigned int environmentalUniforms;
+	glGenBuffers(1, &environmentalUniforms);
+	glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
+	glBufferData(GL_UNIFORM_BUFFER, 160, nullptr, GL_STATIC_DRAW);	//vec3 + float + 2 * (3 * vec3 + float) = 37N = 148bytes
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, environmentalUniforms);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
@@ -91,8 +96,21 @@ int main() {
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(viewMatrix));
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(projectionMatrix));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
+		float pointLight[] = { 0.0f, 0.0f, 0.0f, -1.0f, 1.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.8f };
+		float dirLight[] = { dirLightV.x, dirLightV.y, dirLightV.z, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.8f };
+		float ambient = 0.8f;
+
+		glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, 12, glm::value_ptr(camPos));
+		glBufferSubData(GL_UNIFORM_BUFFER, 16, 52, pointLight);
+		glBufferSubData(GL_UNIFORM_BUFFER, 80, 52, dirLight);
+		glBufferSubData(GL_UNIFORM_BUFFER, 144, 4, &ambient);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		
 		mainShader.uniformBlock("matrices", 0);
+		mainShader.uniformBlock("environment", 1);
 
 		for (int i = 0; i < allObjects.size(); i++) {
 			allObjects[i]->update();
@@ -100,7 +118,6 @@ int main() {
 
 		glfwSwapBuffers(mainWindow);
 		glfwPollEvents();
-
 
 		//std::cout << camPos.x << ' ' << camPos.y << ' ' << camPos.z << std::endl;
 

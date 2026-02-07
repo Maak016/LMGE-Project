@@ -3,6 +3,13 @@
 
 enum uniformType {uint1, int1, float1, float2, float3, float4};
 
+struct lightSource {
+	glm::vec3 dir;
+	glm::vec3 pos;
+	glm::vec3 color;
+	float ambientStrength;
+};
+
 class shader {
 private:
 	unsigned int vShader, gShader, fShader;

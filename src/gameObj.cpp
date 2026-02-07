@@ -28,8 +28,8 @@ void gameObject::update() {
 
 		//rotates the object with i(th) rotation vector
 		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.y, glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.z, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 		modelMatrix = glm::translate(modelMatrix, instances[i].pos);		//translates the object with the i(th) vector
 
