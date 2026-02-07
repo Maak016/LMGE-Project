@@ -1,0 +1,73 @@
+#version 330 core
+
+struct lightSource {
+	vec3 dir;
+	vec3 pos;
+	vec3 color;
+	float ambient;
+};
+
+in vec3 normal;
+in vec3 fragPos;
+in vec2 texCoords;
+
+uniform vec3 camPos;
+uniform lightSource pointLight;
+uniform lightSource dirLight;
+uniform float ambientStrength;
+
+uniform sampler2D tex_diffuse1;
+uniform sampler2D tex_diffuse2;
+uniform sampler2D tex_diffuse3;
+
+uniform sampler2D tex_specular1;
+uniform sampler2D tex_specular2;
+uniform sampler2D tex_specular3;
+
+out vec4 fragColor;
+
+vec3 getPointLightAmbient(lightSource light) {
+	return light.color * light.ambient * vec3(texture(tex_diffuse1, texCoords));
+}
+vec3 getDirLightAmbient(lightSource light) {
+	return light.color * light.ambient * vec3(texture(tex_diffuse1, texCoords));
+}
+
+vec3 getPointLightDiffuse(lightSource light) {
+	vec3 lightDir = normalize(light.pos - fragPos);
+	float strength = max(dot(lightDir, normal), 0.0f);
+
+	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
+}
+vec3 getDirLightDiffuse(lightSource light) {
+	float strength = max(dot(-light.dir, normal), 0.0f);
+
+	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
+}
+
+vec3 getPointLightSpecular(lightSource light) {
+	vec3 viewDir = normalize(camPos - fragPos);
+	vec3 lightDir = normalize(light.pos - fragPos);
+
+	vec3 R = reflect(-lightDir, normal);
+	float strength = max(dot(R, viewDir), 0.0f);
+
+	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
+}
+vec3 getDirLightSpecular(lightSource light) {
+	vec3 viewDir = normalize(camPos - fragPos);
+	vec3 lightDir = normalize(light.dir);
+
+	vec3 R = reflect(lightDir, normal);
+	float strength = max(dot(R, viewDir), 0.0f);
+
+	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
+}
+
+void main() {
+	vec3 ambient = getPointLightAmbient(pointLight) + getDirLightAmbient(dirLight);
+	vec3 diffuse = getPointLightDiffuse(pointLight) + getDirLightDiffuse(dirLight);
+	vec3 specular = getPointLightSpecular(pointLight) + getDirLightSpecular(dirLight);
+
+	fragColor = vec4(ambient.xyz + diffuse.xyz + specular.xyz, 1.0f) * texture(tex_diffuse1, texCoords);
+}

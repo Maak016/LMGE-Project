@@ -1,0 +1,6 @@
+﻿  gameObj.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\gameObj.h(17,16): warning C4091: 'static ': ignored on left of 'gameObject::instance' when no variable is declared
+  (compiling source file 'src/gameObj.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(19,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe
