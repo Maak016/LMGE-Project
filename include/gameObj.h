@@ -43,6 +43,10 @@ public:
 	void collisionState(bool state, unsigned int collideeIndex, instance* collider);
 	void enableCollision(bool val);
 	std::vector<std::vector<glm::vec3>> hitbox();
+
+	glm::vec3 getPos(const unsigned int index);
+	glm::vec3 getRot(const unsigned int index);
+	glm::mat4 getPosMatrix(const unsigned int index);
 };
 
 extern std::vector<gameObject*> allObjects;

@@ -26,12 +26,12 @@ void gameObject::update() {
 	for (int i = 0; i < instances.size(); i++) {
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-		//rotates the object with i(th) rotation vector
-		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, instances[i].rot.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
 		modelMatrix = glm::translate(modelMatrix, instances[i].pos);		//translates the object with the i(th) vector
+
+		//rotates the object with i(th) rotation vector
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(instances[i].rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(instances[i].rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(instances[i].rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		objectModel.draw(renderShader, modelMatrix);
 
@@ -72,14 +72,7 @@ void gameObject::collisionState(bool state, unsigned int collideeIndex, instance
 }
 
 bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex) {
-	glm::mat4 pos = glm::mat4(1.0f);
-
-	pos = glm::rotate(pos, glm::radians(instances[colliderIndex].rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	pos = glm::rotate(pos, glm::radians(instances[colliderIndex].rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	pos = glm::rotate(pos, glm::radians(instances[colliderIndex].rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-	pos = glm::translate(pos, instances[colliderIndex].pos);
-
+	
 	for (int i = 0; i < all.size(); i++) {
 		if (all[i]->getObjectID() == this->objectID) continue;
 
@@ -88,15 +81,35 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 			bool collision = false;
 
 			//iterate through each point forming the hitbox of the (possible) collidee and check if it is inside the current instance
+				//transform the hitbox region (in local coords) to the collidees coords first
+			glm::mat4 collideeModel = all[i]->getPosMatrix(j);
+			std::vector<std::vector<glm::vec3>> collideeHitbox = all[i]->hitbox();
 			std::vector<glm::vec3> points;
-			for (int k = 0; k < all[i]->hitbox().size(); k++) {
-				for (glm::vec3 &vertex : all[i]->hitbox()[k]) points.push_back(vertex);
+			
+			for (std::vector<glm::vec3>& shape : collideeHitbox) {
+				for (glm::vec3& point : shape) {
+					points.push_back(glm::vec3(collideeModel * glm::vec4(point, 1.0f)));
+				}
 			}
 
 			//if one of the current iterating instances is found to have a common area with the subject, the collision state (colliding) of both objects will be set to true
-			std::vector<segment*> collider = genSegments(this->hitboxRegion);
+				//transform the hitbox region of the collider
+			glm::mat4 colliderModel = getPosMatrix(colliderIndex);
+			std::vector<std::vector<glm::vec3>> transformedHitbox;
+
+			for (int k = 0; k < this->hitboxRegion.size(); k++) {
+				if (transformedHitbox.size() < k + 1) transformedHitbox.push_back({});
+
+				std::vector<glm::vec3> current = this->hitboxRegion.at(k);
+
+				for (glm::vec3& coord : current) {
+					transformedHitbox[k].push_back(glm::vec3(colliderModel * glm::vec4(coord, 1.0f)));
+				}
+			}
+
+			std::vector<segment*> collider = genSegments(transformedHitbox);
 			for (int k = 0; k < points.size(); k++) {
-				if (pointInPolygon(points.at(k), pos, collider)) {
+				if (pointInPolygon(points.at(k), colliderModel, collider)) {
 					all[i]->collisionState(true, j, &this->instances[colliderIndex]);
 
 					this->instances[colliderIndex].colliding = true;
@@ -113,10 +126,32 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 		}
 	}
 
-	if (outputObj.size() > 0) return true;
+	if (outputObj.size() > 0) {
+		std::cout << outputObj.size() << std::endl;
+		return true;
+	}
 	return false;
 }
 
 void gameObject::enableCollision(bool val) {
 	collidable = val;
+}
+
+glm::vec3 gameObject::getPos(const unsigned int index) {
+	return instances[index].pos;
+}
+glm::vec3 gameObject::getRot(const unsigned int index) {
+	return instances[index].rot;
+}
+
+glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
+	glm::mat4 result = glm::mat4(1.0f);
+	
+	result = glm::translate(result, instances[index].pos);
+
+	result = glm::rotate(result, glm::radians(instances[index].rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	result = glm::rotate(result, glm::radians(instances[index].rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	result = glm::rotate(result, glm::radians(instances[index].rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	return result;
 }

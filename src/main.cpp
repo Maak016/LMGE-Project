@@ -12,12 +12,24 @@ const int scrHeight = 720;
 bool mouseInput = false;
 bool released = true;
 
+//just for testing and is to be deleted
+
 gameObject testingObject;
+std::vector<glm::vec3> cube = {
+	glm::vec3(-0.3f, 0.3f, 0.3f), glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), glm::vec3(-0.3f, -0.3f, 0.3f),
+	glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f), glm::vec3(-0.3f, -0.3f, -0.3f)
+};
 void setup(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, {});
+	testingObject.init(backpack, s, nullptr, nullptr, {cube});
 
-	testingObject.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(4.0f, -0.5f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+}
+void setup2(shader& s) {
+	model backpack("assets/scene1/backpack/backpack.obj");
+	testingObject.init(backpack, s, nullptr, nullptr, {cube});
+
+	testingObject.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(0.0f, 15.0f, 0.0f));
 }
 
 int main() {
@@ -50,13 +62,14 @@ int main() {
 	unsigned int environmentalUniforms;
 	glGenBuffers(1, &environmentalUniforms);
 	glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
-	glBufferData(GL_UNIFORM_BUFFER, 160, nullptr, GL_STATIC_DRAW);	//vec3 + float + 2 * (3 * vec3 + float) = 37N = 148bytes
+	glBufferData(GL_UNIFORM_BUFFER, 160, nullptr, GL_STATIC_DRAW);	//vec3 + float + 2(3 * vec3 + float + 12byte padding) = 160bytes
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, environmentalUniforms);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
 
 	setup(mainShader);
+	setup2(mainShader);
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -71,6 +84,8 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.2f, 0.3f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//For pressing F to lock and hide the mouse for looking around with the mouse
+		//the boolean "released" is so that input from the key is not received until it has been released
 		if (glfwGetKey(mainWindow, GLFW_KEY_F) && released) {
 			mouseInput = !mouseInput;
 			released = false;
@@ -79,6 +94,7 @@ int main() {
 
 		inputHandler(mainWindow);
 
+		//hide cursor and set the callback for processing input when mouseInput == true
 		if (mouseInput) {
 			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			glfwSetCursorPosCallback(mainWindow, mouseMovementCallback);
@@ -88,10 +104,14 @@ int main() {
 			glfwSetCursorPosCallback(mainWindow, nullptr);
 		}
 
+		//getting the view matrix which must be updated each frame sice camPos and camFront can change at runtime
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camPos, camPos + camFront, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		mainShader.use();
+
+		//setting the data for the matricesBlock uniform buffer
+		//each matrix takes 64 bytes
 		glBindBuffer(GL_UNIFORM_BUFFER, matricesBlock);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(viewMatrix));
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(projectionMatrix));
