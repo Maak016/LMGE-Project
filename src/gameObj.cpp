@@ -126,10 +126,7 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 		}
 	}
 
-	if (outputObj.size() > 0) {
-		std::cout << outputObj.size() << std::endl;
-		return true;
-	}
+	if (outputObj.size() > 0) return true;
 	return false;
 }
 

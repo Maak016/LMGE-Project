@@ -122,7 +122,7 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	std::vector<segment*> intersectingSegs = getIntersectingSegments(point.y, shape);
 
 	//forming the equation for the line parrellel with the x-axis
-	glm::vec3 inversedPoint = glm::vec3(glm::mat3(inverse) * point);
+	glm::vec3 inversedPoint = glm::vec3(inverse * glm::vec4(point, 1.0f));
 	glm::vec2 rightCastEquation = simulEquation(inversedPoint.x, inversedPoint.y, inversedPoint.x + 1.0f, inversedPoint.y);
 
 	linearEquation* castEquation = new linearEquation;
@@ -131,8 +131,8 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	
 	//get all the interection coordinates of the point with possible segments (except ones on the right of the point)
 	for (int i = 0; i < intersectingSegs.size(); i++) {
-		glm::vec3 aInverse = glm::vec3(glm::mat3(inverse) * intersectingSegs[i]->a);
-		glm::vec3 bInverse = glm::vec3(glm::mat3(inverse) * intersectingSegs[i]->b);
+		glm::vec3 aInverse = glm::vec3(inverse * glm::vec4(intersectingSegs[i]->a, 1.0f));
+		glm::vec3 bInverse = glm::vec3(inverse * glm::vec4(intersectingSegs[i]->b, 1.0f));
 		segment* ab = new segment;
 		ab->a = aInverse;
 		ab->b = bInverse;
@@ -141,13 +141,13 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 
 		glm::vec2 intersection = getIntersection(castEquation, segmentEq);
 
-		if (intersection.x < inversedPoint.x) continue;
+		if (intersection.x < inversedPoint.x) continue;	//ignore if the intersection is on the left side of the point
 		intersections.push_back(intersection);
 	}
 
 	//if the number of intersection is even, return false
 	//the number of intersection is divided by two because the object contains two side on the z-axis, doubling the number of intersecting segments
-	if (intersections.size() == 0 || intersections.size() / 2 % 2 == 0) return false;
+	if (intersections.size() == 0 || intersections.size() % 2 == 0) return false;
 	inXRange = true;
 
 	intersections.clear();
@@ -161,8 +161,8 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	castEquation->b = rightCastEquation.y;
 
 	for (int i = 0; i < intersectingSegs.size(); i++) {
-		glm::vec3 aInverse = glm::vec3(glm::mat3(inverse) * intersectingSegs[i]->a);
-		glm::vec3 bInverse = glm::vec3(glm::mat3(inverse) * intersectingSegs[i]->b);
+		glm::vec3 aInverse = glm::vec3(inverse * glm::vec4(intersectingSegs[i]->a, 1.0f));
+		glm::vec3 bInverse = glm::vec3(inverse * glm::vec4(intersectingSegs[i]->b, 1.0f));
 		segment* ab = new segment;
 		ab->a = aInverse;
 		ab->b = bInverse;
@@ -176,7 +176,7 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 		intersections.push_back(intersection);
 	}
 
-	if (intersections.size() / 2 == 0 || intersections.size() / 2 % 2 == 0) return false;
+	if (intersections.size() == 0 || intersections.size() % 2 == 0) return false;
 	inZRange = true;
 
 	if (inXRange && inYRange && inZRange) return true;

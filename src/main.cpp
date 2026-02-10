@@ -12,25 +12,28 @@ const int scrHeight = 720;
 bool mouseInput = false;
 bool released = true;
 
-//just for testing and is to be deleted
-
-gameObject testingObject;
+//hitbox region
 std::vector<glm::vec3> cube = {
 	glm::vec3(-0.3f, 0.3f, 0.3f), glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), glm::vec3(-0.3f, -0.3f, 0.3f),
 	glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f), glm::vec3(-0.3f, -0.3f, -0.3f)
 };
+
+gameObject testingObject;
 void setup(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, {cube});
+	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
 	testingObject.instantiate(glm::vec3(4.0f, -0.5f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
+
+gameObject another;
 void setup2(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, {cube});
+	another.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(0.0f, 15.0f, 0.0f));
+	another.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(15.0f, 15.0f, 0.0f));
 }
+
 
 int main() {
 	if (glfwInit() != GLFW_TRUE) std::cout << "ERROR: GLFW initialization failed." << std::endl;
@@ -68,6 +71,7 @@ int main() {
 
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
 
+	//just for testing
 	setup(mainShader);
 	setup2(mainShader);
 
