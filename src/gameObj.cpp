@@ -134,6 +134,8 @@ void gameObject::enableCollision(bool val) {
 	collidable = val;
 }
 
+void gameObject::enableShowHitbox(bool state) { displayHitbox = state; }
+
 glm::vec3 gameObject::getPos(const unsigned int index) {
 	return instances[index].pos;
 }

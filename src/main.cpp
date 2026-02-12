@@ -14,24 +14,37 @@ bool released = true;
 
 //hitbox region
 std::vector<glm::vec3> cube = {
-	glm::vec3(-0.3f, 0.3f, 0.3f), glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), glm::vec3(-0.3f, -0.3f, 0.3f),
+	glm::vec3(-0.3f, 0.3f, 0.5f), glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), glm::vec3(-0.3f, -0.3f, 0.3f),
 	glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f), glm::vec3(-0.3f, -0.3f, -0.3f)
 };
 
+bool move = false;
 gameObject testingObject;
+void update() {
+	if (move)
+	for (int i = 0; i < testingObject.instances.size(); i++)
+		testingObject.instances[0].pos += glm::vec3(1.0f, 0.0f, 0.0f) * 0.1f;
+}
+
 void setup(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(4.0f, -0.5f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
 }
 
 gameObject another;
+
+void update1() {
+	if (move)
+	for (int i = 0; i < another.instances.size(); i++)
+	another.instances[0].pos -= glm::vec3(1.0f, 0.0f, 0.0f) * 0.1f;
+}
 void setup2(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	another.init(backpack, s, nullptr, nullptr, { cube });
+	another.init(backpack, s, nullptr, update1, { cube });
 
-	another.instantiate(glm::vec3(3.0f, -0.5f, 3.0f), glm::vec3(15.0f, 15.0f, 0.0f));
+	another.instantiate(glm::vec3(100.0f, -0.5f, 3.0f), glm::vec3(0.0f, 15.0f, 0.0f));
 }
 
 
@@ -73,7 +86,7 @@ int main() {
 
 	//just for testing
 	setup(mainShader);
-	setup2(mainShader);
+	//setup2(mainShader);
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -81,12 +94,18 @@ int main() {
 	//runs the one time initialization code of each gameObject object.
 	for (int i = 0; i < allObjects.size(); i++) allObjects[i]->runtimeInit();
 
+	glfwSetTime(0);
+
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(mainWindow)) {
 		currentTime = glfwGetTime();
 
-		glClearColor(0.0f, 0.0f, 0.2f, 0.3f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//for testing only
+		if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS) move = true;
+		else move = false;
 
 		//For pressing F to lock and hide the mouse for looking around with the mouse
 		//the boolean "released" is so that input from the key is not received until it has been released
@@ -122,8 +141,8 @@ int main() {
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
-		float pointLight[] = { 0.0f, 0.0f, 0.0f, -1.0f, 1.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.8f };
-		float dirLight[] = { dirLightV.x, dirLightV.y, dirLightV.z, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.8f };
+		float pointLight[] = { 0.0f, 0.0f, 0.0f, -1.0f, 1.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.3f };
+		float dirLight[] = { dirLightV.x, dirLightV.y, dirLightV.z, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.3f };
 		float ambient = 0.8f;
 
 		glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
@@ -142,8 +161,6 @@ int main() {
 
 		glfwSwapBuffers(mainWindow);
 		glfwPollEvents();
-
-		//std::cout << camPos.x << ' ' << camPos.y << ' ' << camPos.z << std::endl;
 
 		for (int i = 0; i < allObjects.size(); i++)	allObjects[i]->postFrameCleanup();
 

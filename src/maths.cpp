@@ -30,15 +30,32 @@ glm::vec2 simulEquation(float x1, float y1, float x2, float y2) {
 linearEquation* linearEqFromSegment(segment* s) {
 	glm::vec2 ab = simulEquation(s->a.x, s->a.y, s->b.x, s->b.y);
 
+#ifdef DEBUGMODE
+	std::cout << "linear eq generation from segment: ";
+	std::cout << "segment: (" << s->a.x << ',' << s->a.y << ',' << s->a.z << "), (" << s->b.x << ',' << s->b.y << ',' << s->b.z << ')' << std::endl;
+#endif // DEBUGMODE
+
+	
+
 	linearEquation* result = new linearEquation;
+
+	if (s->a.x == s->b.x) {
+		result->a = 1;
+		result->b = -s->a.x;
+		result->c = 0;
+
+		return result;
+	}
+
 	result->a = ab.x;
 	result->b = ab.y;
+	result->c = 1;
 
 	return result;
 }
 glm::vec2 getIntersection(linearEquation* first, linearEquation* second) {
-	float x = (second->b - first->b) / (first->a - second->a);
-	float y = (first->a * x) + first->b;
+	float x = (second->b*first->c - first->b*second->c) / (first->a*second->c - second->a*first->c);
+	float y = ((first->a * x) + first->b) / first->c;
 	return glm::vec2(x, y);
 }
 
@@ -112,6 +129,11 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	if (point.y < maxY && point.y > minY) inYRange = true;
 	else return false;
 
+#ifdef DEBUGMODE
+	std::cout << std::endl << "--Collision system--\n";
+	std::cout << "y check:" << ' ' << maxY << ' ' << minY << ' ' << point.y << std::endl;
+#endif
+
 	///
 	//checking the x-coordinates
 	///
@@ -142,6 +164,17 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 		glm::vec2 intersection = getIntersection(castEquation, segmentEq);
 
 		if (intersection.x < inversedPoint.x) continue;	//ignore if the intersection is on the left side of the point
+		
+#ifdef DEBUGMODE
+		//for debugging
+		std::cout << "x check:" << std::endl;
+		std::cout << "point coordinates:" << inversedPoint.x << ' ' << inversedPoint.y << ' ' << inversedPoint.z << std::endl;
+		std::cout << "cast equation: y =" << castEquation->a << 'x' << '+' << castEquation->b << std::endl;
+		std::cout << "polygon's segment: (" << ab->a.x << ',' << ab->a.y << ',' << ab->a.z << "), (" << ab->b.x << ',' << ab->b.y << ',' << ab->b.z << ')' << std::endl;
+		std::cout << "segment's eq: y = " << segmentEq->a << 'x' << '+' << segmentEq->b << std::endl;
+		std::cout << "intersection: (" << intersection.x << ',' << intersection.y << ')' << std::endl;
+#endif
+
 		intersections.push_back(intersection);
 	}
 

@@ -69,7 +69,7 @@ vec3 getDirLightSpecular(lightSource light) {
 
 void main() {
 	vec3 ambient = getPointLightAmbient(pointLight) + getDirLightAmbient(dirLight);
-	vec3 diffuse = getPointLightDiffuse(pointLight) + getDirLightDiffuse(dirLight);
+	vec3 diffuse = getPointLightDiffuse(pointLight) + getDirLightDiffuse(dirLight); 
 	vec3 specular = getPointLightSpecular(pointLight) + getDirLightSpecular(dirLight);
 
 	fragColor = vec4(ambient.xyz + diffuse.xyz + specular.xyz, 1.0f) * texture(tex_diffuse1, texCoords);

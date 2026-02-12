@@ -12,7 +12,7 @@ void Mesh::setup() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, coords)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normals)));
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, texCoords)));
 
@@ -27,8 +27,6 @@ void Mesh::setup() {
 
 	//unbind
 	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures) {
 	this->vertices = vertices;
@@ -50,10 +48,10 @@ void Mesh::draw(shader& Shader, glm::mat4& modelMatrix) {
 		if (current.name == "tex_diffuse") num = std::to_string(++diffN);
 		else if (current.name == "tex_specular") num = std::to_string(++specN);
 
-		Shader.uniform(int1, current.name + num, { static_cast<float>(i) });
-
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, current.ID);
+
+		Shader.uniform(int1, current.name + num, { static_cast<float>(i) });
 		num.clear();
 	}
 	Shader.uniform("model", modelMatrix);
@@ -99,6 +97,8 @@ unsigned int model::importTexture(const std::string path) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+	stbi_image_free(data);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return texture;
@@ -114,7 +114,7 @@ std::vector<Texture> model::processMaterial(aiMaterial* mat, aiTextureType type,
 		mat->GetTexture(type, i, &str);
 		std::string path = str.C_Str();
 
-		for (Texture texture : loadedTextures) {
+		for (Texture& texture : loadedTextures) {
 			if (texture.path == path) {
 				loaded = true;
 				result.push_back(texture);
@@ -152,7 +152,10 @@ Mesh model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		Vertex current;
 		current.coords = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 		current.normals = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-		current.texCoords = glm::vec2(mesh->mTextureCoords[0]->x, mesh->mTextureCoords[0]->y);
+		if (mesh->mTextureCoords[0])
+			current.texCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+		else
+			current.texCoords = glm::vec2(0.0f, 0.0f);
 
 		vertices.push_back(current);
 	}

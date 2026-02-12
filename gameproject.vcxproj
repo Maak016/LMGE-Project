@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Visual Studio projects\gameproject\gameproject\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Visual Studio projects\gameproject\gameproject\assets;D:\Visual Studio projects\gameproject\gameproject\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Visual Studio projects\gameproject\gameproject\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -152,8 +152,20 @@
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\scene1\backpack\backpack.mtl" />
+    <None Include="shaders\main - Copy.lmf" />
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\scene1\backpack\ao.jpg" />
+    <Image Include="assets\scene1\backpack\diffuse.jpg" />
+    <Image Include="assets\scene1\backpack\normal.png" />
+    <Image Include="assets\scene1\backpack\roughness.jpg" />
+    <Image Include="assets\scene1\backpack\specular.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\scene1\backpack\source_attribution.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

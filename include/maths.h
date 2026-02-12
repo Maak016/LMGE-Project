@@ -8,6 +8,7 @@ enum feasibleRegionOp {null, less, greater};
 struct linearEquation {
 	float a;
 	float b;
+	float c = 1;
 };
 struct segment {
 	glm::vec3 a;

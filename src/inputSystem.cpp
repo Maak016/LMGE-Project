@@ -25,7 +25,12 @@ void inputHandler(GLFWwindow* window) {
 	glm::vec3 currentDir;
 
 	currentDir = lastPos == camPos ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::normalize(camPos - lastPos);
-	//std::cout << currentDir.x << ' ' << currentDir.z << '\n' << '\n' << std::endl;
+
+#ifdef DEBUGMODE
+	std::cout << std::endl << "--Player movement properties-- \n";
+	std::cout << "current movement direction: " << currentDir.x << ',' << currentDir.y << ',' << currentDir.z << std::endl;
+	std::cout << "camera (player) pos: " << camPos.x << ',' << camPos.y << ',' << camPos.z << std::endl;
+#endif
 
 	glm::vec3 counterMovement = -currentDir * G * 0.01f;
 	moveVector += counterMovement;

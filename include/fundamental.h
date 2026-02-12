@@ -20,4 +20,6 @@
 
 #include "maths.h"
 
+//#define DEBUGMODE
+
 extern double deltaTime;

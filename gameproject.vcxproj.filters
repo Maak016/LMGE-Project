@@ -69,5 +69,27 @@
   <ItemGroup>
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
+    <None Include="assets\scene1\backpack\backpack.mtl" />
+    <None Include="shaders\main - Copy.lmf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\scene1\backpack\ao.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\scene1\backpack\diffuse.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\scene1\backpack\specular.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\scene1\backpack\normal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\scene1\backpack\roughness.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\scene1\backpack\source_attribution.txt" />
   </ItemGroup>
 </Project>
