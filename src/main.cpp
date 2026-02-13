@@ -82,7 +82,11 @@ int main() {
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, environmentalUniforms);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+#ifdef DISABLE_LIGHTING
+	shader mainShader("shaders/main.lmv", "shaders/noLighting.lmf");
+#else
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
+#endif
 
 	//just for testing
 	setup(mainShader);

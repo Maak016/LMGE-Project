@@ -21,5 +21,6 @@
 #include "maths.h"
 
 //#define DEBUGMODE
+#define DISABLE_LIGHTING
 
 extern double deltaTime;

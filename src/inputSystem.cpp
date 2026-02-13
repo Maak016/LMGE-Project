@@ -11,7 +11,7 @@ double yaw = 0;
 
 const double moveSpeedNorm = 0.1;
 const double moveSpeedFast = 1.5 * moveSpeedNorm;
-const float jumpStrength = 2.0f;
+const float jumpStrength = 10.0f;
 bool jumping = false;
 
 constexpr float G = 9.81;
@@ -37,7 +37,7 @@ void inputHandler(GLFWwindow* window) {
 
 	lastPos = glm::vec3(camPos.x, 0.0f, camPos.z);
 	if (camPos.y > -1.0f) {
-		moveVector += glm::vec3(0.0f, -1.0f, 0.0f) * 0.0001f * G * (float)deltaTime;
+		moveVector += glm::vec3(0.0f, -1.0f, 0.0f) * 0.00001f * G * (float)deltaTime;
 		jumping = true;
 	}
 	else {

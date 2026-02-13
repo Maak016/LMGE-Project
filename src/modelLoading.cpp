@@ -48,6 +48,10 @@ void Mesh::draw(shader& Shader, glm::mat4& modelMatrix) {
 		if (current.name == "tex_diffuse") num = std::to_string(++diffN);
 		else if (current.name == "tex_specular") num = std::to_string(++specN);
 
+#ifdef DISABLE_LIGHTING
+		if (current.name == "tex_specular") continue;
+#endif
+
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, current.ID);
 
@@ -74,31 +78,34 @@ unsigned int model::importTexture(const std::string path) {
 	std::cout << "LOADING: " << fullPath << std::endl;
 
 	int x, y, nC;
+	GLenum format;
+
 	unsigned char* data = stbi_load(fullPath.c_str(), &x, &y, &nC, 0);
 	if (!data) {
 		std::cout << "ERROR: Loading texture file failed from path: '" << fullPath << "'." << std::endl;
 	}
-	else std::cout << "SUCCESSFUL: " << fullPath << std::endl;
+	else {
+		std::cout << "SUCCESSFUL: " << fullPath << std::endl;
 
-	GLenum format;
-	switch (nC) {
-	case 1: format = GL_RED; break;
-	case 3: format = GL_RGB; break;
-	case 4: format = GL_RGBA; break;
-	default:
-		std::cout << "UNEXPECTED ERROR: More than 4 or Fewer than 1 color components in texture loaded from: " << fullPath << std::endl;
-		break;
+		switch (nC) {
+		case 1: format = GL_RED; break;
+		case 3: format = GL_RGB; break;
+		case 4: format = GL_RGBA; break;
+		default:
+			std::cout << "UNEXPECTED ERROR: More than 4 or Fewer than 1 color components in texture loaded from: " << fullPath << std::endl;
+			break;
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, format, x, y, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		stbi_image_free(data);
 	}
-
-	glTexImage2D(GL_TEXTURE_2D, 0, format, x, y, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	stbi_image_free(data);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -128,8 +135,6 @@ std::vector<Texture> model::processMaterial(aiMaterial* mat, aiTextureType type,
 			current.path = path;
 			current.name = typeName;
 			loadedTextures.push_back(current);
-
-			std::cout << current.ID << ' ' << current.path << ' ' << current.name << std::endl;
 
 			result.push_back(current);
 		}

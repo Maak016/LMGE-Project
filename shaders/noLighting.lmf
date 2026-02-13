@@ -1,0 +1,34 @@
+#version 330 core
+
+struct lightSource {
+	vec3 dir;
+	vec3 pos;
+	vec3 color;
+	float ambient;
+};
+
+in vec3 normal;
+in vec3 fragPos;
+in vec2 texCoords;
+
+layout(std140) uniform environment {
+	vec3 camPos;
+	lightSource pointLight;
+	lightSource dirLight;
+	float ambientStrength;
+};
+
+
+uniform sampler2D tex_diffuse1;
+uniform sampler2D tex_diffuse2;
+uniform sampler2D tex_diffuse3;
+
+uniform sampler2D tex_specular1;
+uniform sampler2D tex_specular2;
+uniform sampler2D tex_specular3;
+
+out vec4 fragColor;
+
+void main() {
+	fragColor = vec4(texture(tex_diffuse1, texCoords));
+}
