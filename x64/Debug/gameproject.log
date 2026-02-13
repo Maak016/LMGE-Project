@@ -2,13 +2,4 @@
 D:\Visual Studio projects\gameproject\gameproject\include\gameObj.h(18,16): warning C4091: 'static ': ignored on left of 'gameObject::instance' when no variable is declared
   (compiling source file 'src/main.cpp')
   
-  modelLoading.cpp
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(59,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(109,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(139,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(143,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(151,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(165,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(168,21): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

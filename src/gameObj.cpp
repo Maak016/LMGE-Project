@@ -154,3 +154,5 @@ glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
 
 	return result;
 }
+
+shader gameObject::getRenderShader() { return renderShader; }

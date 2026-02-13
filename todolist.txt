@@ -1,5 +1,0 @@
--5/2/2026: Fix memory leak in maths.cpp (undeleted pointers)
--6/2/2026: Fix model not rendering (DONE)
--8/2/2026: Implement instancing in model drawing
--8/2/2026: Fix textures not rendering
--8/2/2026: Test collision system

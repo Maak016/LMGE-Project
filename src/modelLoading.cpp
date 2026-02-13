@@ -60,6 +60,7 @@ void Mesh::draw(shader& Shader, glm::mat4& modelMatrix) {
 	glBindVertexArray(0);
 }
 
+//to import texture from a file and return the openGL texture object, to be used in assimp material procession
 unsigned int model::importTexture(const std::string path) {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -127,6 +128,8 @@ std::vector<Texture> model::processMaterial(aiMaterial* mat, aiTextureType type,
 			current.path = path;
 			current.name = typeName;
 			loadedTextures.push_back(current);
+
+			std::cout << current.ID << ' ' << current.path << ' ' << current.name << std::endl;
 
 			result.push_back(current);
 		}
