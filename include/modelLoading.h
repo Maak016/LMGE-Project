@@ -6,6 +6,8 @@
 #include "assimp/postprocess.h"
 #include "shader.h"
 
+enum objects3D {CUBE, SPHERE, PYRAMID };
+
 struct Texture {
 	unsigned int ID;
 	std::string path;
@@ -43,5 +45,7 @@ public:
 	void init(std::string path);
 	model();
 	model(std::string path);
+	void modelSimple(objects3D shape, std::string texturePath);
+	void modelSimple(objects3D shape);
 	void draw(shader& Shader, glm::mat4& modelMatrix);
 };

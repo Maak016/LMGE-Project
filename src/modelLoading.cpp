@@ -222,3 +222,11 @@ void model::draw(shader& Shader, glm::mat4& modelMatrix) {
 		meshes.at(i).draw(Shader, modelMatrix);
 	}
 }
+
+void model::modelSimple(objects3D shape, std::string path) {
+
+}
+
+void model::modelSimple(objects3D shape) {
+
+}

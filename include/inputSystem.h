@@ -17,3 +17,5 @@ extern const float FOV;
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void mouseMovementCallback(GLFWwindow* window, double xPos, double yPos);
 void inputHandler(GLFWwindow* window);
+glm::vec3 getMovementVector();
+void addForce(glm::vec3 direction, float magnitude);

@@ -67,6 +67,13 @@ void inputHandler(GLFWwindow* window) {
 
 	camPos += moveVector;
 }
+glm::vec3 getMovementVector() { return moveVector; }
+void addForce(glm::vec3 direction, float magnitude) {
+	direction = glm::normalize(direction);
+	direction *= magnitude * static_cast<float>(deltaTime);
+
+	moveVector += direction;
+}
 
 double lastX = scrWidth / 2;
 double lastY = scrHeight / 2;

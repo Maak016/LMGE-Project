@@ -70,7 +70,7 @@
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
     <None Include="assets\scene1\backpack\backpack.mtl" />
-    <None Include="shaders\main - Copy.lmf" />
+    <None Include="toDoList.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\scene1\backpack\ao.jpg">

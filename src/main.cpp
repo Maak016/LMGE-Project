@@ -27,7 +27,7 @@ void update() {
 }
 
 void setup(shader& s) {
-	model backpack("assets/scene1/backpack/backpack.obj");
+	model backpack("assets/scene2/house/uploads_files_2720101_BusGameMap.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
 	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));

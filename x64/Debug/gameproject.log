@@ -1,3 +1,5 @@
-﻿  inputSystem.cpp
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(17,19): warning C4305: 'initializing': truncation from 'double' to 'const float'
+﻿  main.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\gameObj.h(18,16): warning C4091: 'static ': ignored on left of 'gameObject::instance' when no variable is declared
+  (compiling source file 'src/main.cpp')
+  
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe
