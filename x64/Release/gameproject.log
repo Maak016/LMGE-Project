@@ -1,0 +1,15 @@
+﻿  modelLoading.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(64,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(125,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(155,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(159,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(167,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(181,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(184,21): warning C4018: '<': signed/unsigned mismatch
+LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  2 of 1459 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    9 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Release\gameproject.exe

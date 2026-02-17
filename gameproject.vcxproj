@@ -125,10 +125,12 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Visual Studio projects\gameproject\gameproject\assets;D:\Visual Studio projects\gameproject\gameproject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\Visual Studio projects\gameproject\gameproject\lib\glfw3.lib;D:\Visual Studio projects\gameproject\gameproject\lib\assimp-vc145-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,8 +155,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\scene1\backpack\backpack.mtl" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
+    <None Include="shaders\noLighting.lmf" />
+    <None Include="shaders\noTexture.lmf" />
     <None Include="toDoList.md" />
   </ItemGroup>
   <ItemGroup>

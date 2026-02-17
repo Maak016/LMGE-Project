@@ -71,6 +71,10 @@
     <None Include="shaders\main.lmv" />
     <None Include="assets\scene1\backpack\backpack.mtl" />
     <None Include="toDoList.md" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+    <None Include="shaders\noTexture.lmf" />
+    <None Include="shaders\noLighting.lmf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\scene1\backpack\ao.jpg">

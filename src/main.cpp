@@ -27,10 +27,12 @@ void update() {
 }
 
 void setup(shader& s) {
-	model backpack("assets/scene2/house/uploads_files_2720101_BusGameMap.obj");
+	model backpack("assets/scene2/Castle/Castle OBJ.obj");
+	//model backpack("assets/scene2/city/uploads_files_2720101_BusGameMap.obj");
+	//model backpack("assets/scene2/city2/Castelia City.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(30.0f, -25.0f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
 }
 
 gameObject another;
@@ -42,9 +44,9 @@ void update1() {
 }
 void setup2(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
-	another.init(backpack, s, nullptr, update1, { cube });
+	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	another.instantiate(glm::vec3(100.0f, -0.5f, 3.0f), glm::vec3(0.0f, 15.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
 }
 
 
@@ -89,8 +91,8 @@ int main() {
 #endif
 
 	//just for testing
-	setup(mainShader);
-	//setup2(mainShader);
+	//setup(mainShader);
+	setup2(mainShader);
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -104,7 +106,7 @@ int main() {
 	while (!glfwWindowShouldClose(mainWindow)) {
 		currentTime = glfwGetTime();
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.3f, 0.3f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//for testing only

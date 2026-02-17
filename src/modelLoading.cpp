@@ -46,11 +46,12 @@ void Mesh::draw(shader& Shader, glm::mat4& modelMatrix) {
 		Texture current = textures[i];
 		std::string num;
 		if (current.name == "tex_diffuse") num = std::to_string(++diffN);
-		else if (current.name == "tex_specular") num = std::to_string(++specN);
-
+		else if (current.name == "tex_specular") {
 #ifdef DISABLE_LIGHTING
-		if (current.name == "tex_specular") continue;
+			continue;
 #endif
+			num = std::to_string(++specN);
+		}
 
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, current.ID);
@@ -78,31 +79,39 @@ unsigned int model::importTexture(const std::string path) {
 	std::cout << "LOADING: " << fullPath << std::endl;
 
 	int x, y, nC;
-	GLenum format;
+	GLenum format, internalFormat;
 
 	unsigned char* data = stbi_load(fullPath.c_str(), &x, &y, &nC, 0);
 	if (!data) {
 		std::cout << "ERROR: Loading texture file failed from path: '" << fullPath << "'." << std::endl;
 	}
 	else {
-		std::cout << "SUCCESSFUL: " << fullPath << std::endl;
-
 		switch (nC) {
-		case 1: format = GL_RED; break;
-		case 3: format = GL_RGB; break;
-		case 4: format = GL_RGBA; break;
+		case 1: 
+			format = GL_RED; break;
+		case 3: 
+			format = GL_RGB;
+			internalFormat = GL_RGB8;
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			break;
+		case 4: 
+			format = GL_RGBA;
+			internalFormat = GL_RGBA8;
+			break;
 		default:
 			std::cout << "UNEXPECTED ERROR: More than 4 or Fewer than 1 color components in texture loaded from: " << fullPath << std::endl;
 			break;
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, format, x, y, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, x, y, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		std::cout << "SUCCESSFUL: " << fullPath << std::endl;
 
 		stbi_image_free(data);
 	}
