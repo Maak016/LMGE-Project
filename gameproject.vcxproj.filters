@@ -75,6 +75,9 @@
     <None Include="README.md" />
     <None Include="shaders\noTexture.lmf" />
     <None Include="shaders\noLighting.lmf" />
+    <None Include="shaders\noInstancing.lmv" />
+    <None Include="shaders\cubemapRenderer.lmf" />
+    <None Include="shaders\cubemapRenderer.lmv" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\scene1\backpack\ao.jpg">

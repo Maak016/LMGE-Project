@@ -29,6 +29,9 @@ public:
 	void setup();
 	Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<Texture>& textures);
 	void draw(shader& Shader, glm::mat4 &modelMatrix);
+	void drawInstanced(shader& Shader, unsigned int numInstances);
+
+	unsigned int getVertexArray();
 };
 
 class model {
@@ -48,4 +51,33 @@ public:
 	void modelSimple(objects3D shape, std::string texturePath);
 	void modelSimple(objects3D shape);
 	void draw(shader& Shader, glm::mat4& modelMatrix);
+	void drawInstanced(shader& shader, unsigned int numInstances);
+
+	std::vector<Mesh> getModelMesh();
 };
+
+class skybox {
+private:
+	unsigned int skyboxID;
+	unsigned int textureID;
+
+	shader skyboxRenderer;
+
+	std::string directory;
+
+	unsigned int boxVAO, boxVBO;
+
+	std::vector<std::string> faceName =
+	{ "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg" };
+public:
+	unsigned int getID();
+
+	void init(const std::string imageFolder);
+	void makeActive();
+	static void makeActive(const unsigned int skyboxID);
+
+	void update(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
+};
+
+extern std::vector<skybox*> savedSkyboxes;
+extern skybox* activeSkybox;

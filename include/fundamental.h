@@ -22,5 +22,7 @@
 
 //#define DEBUGMODE
 #define DISABLE_LIGHTING
+//#define DISABLE_INSTANCING
+//#define LEGACY_COLLISION
 
 extern double deltaTime;

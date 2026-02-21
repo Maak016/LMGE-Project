@@ -15,7 +15,7 @@ private:
 	void(*updateFunc)(void) = nullptr;
 	void(*onCollision)(void) = nullptr;
 
-	static struct instance {
+	struct instance {
 		unsigned int parentID;
 
 		glm::vec3 pos;
@@ -24,10 +24,13 @@ private:
 		bool colliding = false;
 		std::vector<instance*> collidees;
 	};
+	std::vector<glm::mat4> instanceModel;
 
 	bool collidable;
-
 	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
+
+	std::vector<glm::mat4> getInstanceModel();
+	void bindInstanceModel();
 public:
 	std::vector<instance> instances;
 

@@ -159,8 +159,11 @@
     <None Include="README.md" />
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
+    <None Include="shaders\noInstancing.lmv" />
     <None Include="shaders\noLighting.lmf" />
     <None Include="shaders\noTexture.lmf" />
+    <None Include="shaders\cubemapRenderer.lmf" />
+    <None Include="shaders\cubemapRenderer.lmv" />
     <None Include="toDoList.md" />
   </ItemGroup>
   <ItemGroup>

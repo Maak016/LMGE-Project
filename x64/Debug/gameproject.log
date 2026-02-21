@@ -1,9 +1,7 @@
-﻿  modelLoading.cpp
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(64,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(126,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(156,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(160,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(168,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(182,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(185,21): warning C4018: '<': signed/unsigned mismatch
+﻿  yes.cpp
+  gameObj.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(19,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(51,56): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  main.cpp
+  Generating Code...
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

@@ -1,0 +1,14 @@
+#version 330 core
+
+layout (location = 0) in vec3 localPos;
+
+out vec3 texCoords;
+
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+void main() {
+	gl_Position = projectionMatrix * mat4(mat3(viewMatrix)) * vec4(localPos, 1.0f);
+
+	texCoords = normalize(localPos);
+}

@@ -20,28 +20,14 @@ std::vector<glm::vec3> cube = {
 
 bool move = false;
 gameObject testingObject;
-void update() {
-	if (move)
-	for (int i = 0; i < testingObject.instances.size(); i++)
-		testingObject.instances[0].pos += glm::vec3(1.0f, 0.0f, 0.0f) * 0.1f;
-}
-
 void setup(shader& s) {
 	model backpack("assets/scene2/Castle/Castle OBJ.obj");
-	//model backpack("assets/scene2/city/uploads_files_2720101_BusGameMap.obj");
-	//model backpack("assets/scene2/city2/Castelia City.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(30.0f, -25.0f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(30.0f, -26.0f, 25.0f), glm::vec3(0.0f, 50.0f, 0.0f));
 }
 
 gameObject another;
-
-void update1() {
-	if (move)
-	for (int i = 0; i < another.instances.size(); i++)
-	another.instances[0].pos -= glm::vec3(1.0f, 0.0f, 0.0f) * 0.1f;
-}
 void setup2(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
@@ -86,13 +72,16 @@ int main() {
 
 #ifdef DISABLE_LIGHTING
 	shader mainShader("shaders/main.lmv", "shaders/noLighting.lmf");
+#elif defined(DISABLE_INSTANCING)
+	shader mainShader("shaders/noInstancing.lmv", "shaders/main.lmf");
 #else
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
 #endif
 
 	//just for testing
-	//setup(mainShader);
-	setup2(mainShader);
+	setup(mainShader);
+	skybox normSkybox;
+	normSkybox.init("assets/scene2/skyboxNorm");
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -106,12 +95,8 @@ int main() {
 	while (!glfwWindowShouldClose(mainWindow)) {
 		currentTime = glfwGetTime();
 
-		glClearColor(0.0f, 0.0f, 0.3f, 0.3f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//for testing only
-		if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS) move = true;
-		else move = false;
 
 		//For pressing F to lock and hide the mouse for looking around with the mouse
 		//the boolean "released" is so that input from the key is not received until it has been released
@@ -137,6 +122,8 @@ int main() {
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camPos, camPos + camFront, glm::vec3(0.0f, 1.0f, 0.0f));
 
+		activeSkybox->update(viewMatrix, projectionMatrix);
+
 		mainShader.use();
 
 		//setting the data for the matricesBlock uniform buffer
@@ -152,9 +139,9 @@ int main() {
 		float ambient = 0.8f;
 
 		glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, 12, glm::value_ptr(camPos));
-		glBufferSubData(GL_UNIFORM_BUFFER, 16, 52, pointLight);
-		glBufferSubData(GL_UNIFORM_BUFFER, 80, 52, dirLight);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, 16, glm::value_ptr(camPos));
+		glBufferSubData(GL_UNIFORM_BUFFER, 16, 64, pointLight);
+		glBufferSubData(GL_UNIFORM_BUFFER, 80, 64, dirLight);
 		glBufferSubData(GL_UNIFORM_BUFFER, 144, 4, &ambient);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		

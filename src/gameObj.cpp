@@ -23,6 +23,7 @@ void gameObject::update() {
 	if (updateFunc != nullptr)
 	updateFunc();
 
+#ifdef DISABLE_INSTANCING
 	for (int i = 0; i < instances.size(); i++) {
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -43,6 +44,21 @@ void gameObject::update() {
 			}
 		}
 	}
+#else
+	instanceModel = getInstanceModel();
+	bindInstanceModel();
+
+	objectModel.drawInstanced(renderShader, instances.size());
+
+	for(int i = 0; i < instances.size(); i++)
+		if (collidable) {
+			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
+				std::cout << "Collision = TRUE" << std::endl;
+
+				if (onCollision != nullptr) onCollision();
+			}
+		}
+#endif
 }
 void gameObject::postFrameCleanup() {
 	for (int i = 0; i < instances.size(); i++) {
@@ -156,3 +172,42 @@ glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
 }
 
 shader gameObject::getRenderShader() { return renderShader; }
+
+std::vector<glm::mat4> gameObject::getInstanceModel() {
+	std::vector<glm::mat4> result;
+	for (int i = 0; i < instances.size(); i++) {
+		result.push_back(getPosMatrix(i));
+	}
+
+	return result;
+}
+
+void gameObject::bindInstanceModel() {
+	std::vector<Mesh> meshes = this->objectModel.getModelMesh();
+
+	//transfer data from vector to normal array
+	glm::mat4* matrices = instanceModel.data();
+
+	for (int i = 0; i < meshes.size(); i++) {
+		unsigned int currentVAO = meshes[i].getVertexArray();
+
+		glBindVertexArray(currentVAO);
+
+		unsigned int instanceVBO;
+		glGenBuffers(1, &instanceVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		glBufferData(GL_ARRAY_BUFFER, instanceModel.size() * sizeof(glm::mat4), matrices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)sizeof(glm::vec4));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+		for (int i = 3; i <= 6; i++) {
+			glEnableVertexAttribArray(i);
+			glVertexAttribDivisor(i, 1);
+		}
+
+		glBindVertexArray(0);
+	}
+}
