@@ -1,5 +1,139 @@
 #include "shader.h"
 
+unsigned int numActiveDirLight = 0;
+unsigned int numActivePointLight = 0;
+
+std::vector<lightSource*> allLights;
+
+lightSource::lightSource(glm::vec3 pos, glm::vec3 dir, glm::vec3 color, float ambient) {
+	this->dir = dir;
+	this->pos = pos;
+	this->color = color;
+	this->ambientStrength = ambient;
+
+	directional = pos == glm::vec3(0.0f, 0.0f, 0.0f);
+
+	allLights.push_back(this);
+}
+void lightSource::makeDynamic(void(*updateFunction)(void)) { this->updateFunction = updateFunction; }
+
+void lightSource::bind(shader& currentShader) {
+	if (updateFunction != nullptr) updateFunction();
+
+	if (visualizationEnabled && renderingDataInitialized)
+		std::cout << "WARNING: Using normal lightSource::bind(shader&) instead of lightSource::bind(shader&, glm::vec3) although light source visualization is enabled. The light source will not be rendered." << std::endl;
+
+	currentShader.use();
+	std::string name = directional ? "dirLight[" + std::to_string(numActiveDirLight++) + "]" : "pointLight[" + std::to_string(numActivePointLight++) + "]";
+
+	//binding the dir or pos member based on the light source's detection to be a directional light, thus avoiding uniform binding error
+	if (directional) currentShader.uniform(float3, name + ".dir", { dir.x, dir.y, dir.z });
+	else currentShader.uniform(float3, name + ".pos", { pos.x, pos.y, pos.z });
+
+	currentShader.uniform(float3, name + ".color", { color.x, color.y, color.z });
+	currentShader.uniform(float1, name + ".ambient", { ambientStrength });
+}
+
+void lightSource::bind(shader& currentShader, glm::vec3 camPos) {
+	if (updateFunction != nullptr) updateFunction();
+
+	//render the light if enabled
+	if (visualizationEnabled && renderingDataInitialized) {
+		renderingShader.use();
+
+		glBindVertexArray(renderingVAO);
+
+		renderingShader.uniformBlock("matrices", 0);
+
+		glm::mat4 model = glm::mat4(1.0f);
+
+		if (directional) model = glm::translate(model, camPos + (dir * 15.0f));
+		else model = glm::translate(model, pos);
+
+		renderingShader.uniform("lightModel", model);
+		renderingShader.uniform(float3, "lightColor", { color.x, color.y, color.z });
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+	}
+
+	currentShader.use();
+	std::string name = directional ? "dirLight[" + std::to_string(numActiveDirLight++) + "]" : "pointLight[" + std::to_string(numActivePointLight++) + "]";
+
+	//binding the dir or pos member based on the light source's detection to be a directional light, thus avoiding uniform binding error
+	if (directional) currentShader.uniform(float3, name + ".dir", { dir.x, dir.y, dir.z });
+	else currentShader.uniform(float3, name + ".pos", { pos.x, pos.y, pos.z });
+
+	currentShader.uniform(float3, name + ".color", { color.x, color.y, color.z });
+	currentShader.uniform(float1, name + ".ambient", { ambientStrength });
+}
+
+void lightSource::postFrameCleanup() {
+	numActiveDirLight = 0;
+	numActivePointLight = 0;
+}
+
+void lightSource::visualize(bool val) {
+	//if the user sets visualization to false, visualizationEnabled will be set to false and the function will exit, preventing any further code execution
+	if (!val) {
+		visualizationEnabled = false;
+		return;
+	}
+	//exit the function if VAO initialized has been completed, preventing further excessive process that could harm performance
+	if (val && renderingDataInitialized) {
+		visualizationEnabled = true;
+		return;
+	}
+
+	visualizationEnabled = true;
+	//setting up rendering data
+	const float vertices[] =
+	{
+		-0.5f, -0.5f, 0.5f,     0.5f, -0.5f, 0.5f,     -0.5f, 0.5f, 0.5f,		//front side    
+		0.5f, -0.5f, 0.5f,      -0.5f, 0.5f, 0.5f,     0.5f, 0.5f, 0.5f,
+
+		0.5f, -0.5f, -0.5f,     -0.5f, -0.5f, -0.5f,   0.5f, 0.5f, -0.5f,		//back side
+		-0.5f, -0.5f, -0.5f,    0.5f, 0.5f, -0.5f,     -0.5f, 0.5f, -0.5f,
+
+		0.5f, -0.5f, 0.5f,      0.5f, -0.5f, -0.5f,    0.5f, 0.5f, 0.5f,		//right side 
+		0.5f, -0.5f, -0.5f,     0.5f, 0.5f, 0.5f,      0.5f, 0.5f, -0.5f,
+
+		-0.5f, -0.5f, -0.5f,    -0.5f, -0.5f, 0.5f,    -0.5f, 0.5f, -0.5f,		//left side 
+		-0.5f, -0.5f, 0.5f,     -0.5f, 0.5f, -0.5f,    -0.5f, 0.5f, 0.5f,
+
+		-0.5f, 0.5f, 0.5f,      0.5f, 0.5f, 0.5f,      -0.5f, 0.5f, -0.5f,		//top side
+		0.5f, 0.5f, 0.5f,       -0.5f, 0.5f, -0.5f,    0.5f, 0.5f, -0.5f,
+
+		-0.5f, -0.5f, -0.5f,    0.5f, -0.5f, -0.5f,    -0.5f, -0.5f, 0.5f,		//bottom side
+		0.5f, -0.5f, -0.5f,     -0.5f, -0.5f, 0.5f,    0.5f, -0.5f, 0.5f
+	};
+
+	glGenVertexArrays(1, &renderingVAO);
+	glBindVertexArray(renderingVAO);
+
+	glGenBuffers(1, &renderingVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, renderingVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+
+	renderingShader.init("shaders/lightSource.lmv", "shaders/lightSource.lmf");
+
+	renderingDataInitialized = true;
+	std::cout << "SUCCESSFUL: Setting up light source object for rendering." << std::endl;
+}
+
+void lightSource::changePos(glm::vec3 value) {
+	if (directional) dir = value;
+	else pos = value;
+}
+void lightSource::changeColor(glm::vec3 value) { color = value; }
+void lightSource::shiftPos(glm::vec3 movementVector) { this->pos += movementVector; }
+void lightSource::shiftColor(glm::vec3 vector) { this->color += vector; }
+
 shader::shader(){}
 
 std::string shader::getData(const std::string path) {

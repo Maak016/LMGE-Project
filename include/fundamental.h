@@ -21,7 +21,7 @@
 #include "maths.h"
 
 //#define DEBUGMODE
-#define DISABLE_LIGHTING
+//#define DISABLE_LIGHTING
 //#define DISABLE_INSTANCING
 //#define LEGACY_COLLISION
 

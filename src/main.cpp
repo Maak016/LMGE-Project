@@ -63,13 +63,6 @@ int main() {
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, matricesBlock);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	unsigned int environmentalUniforms;
-	glGenBuffers(1, &environmentalUniforms);
-	glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
-	glBufferData(GL_UNIFORM_BUFFER, 160, nullptr, GL_STATIC_DRAW);	//vec3 + float + 2(3 * vec3 + float + 12byte padding) = 160bytes
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, environmentalUniforms);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 #ifdef DISABLE_LIGHTING
 	shader mainShader("shaders/main.lmv", "shaders/noLighting.lmf");
 #elif defined(DISABLE_INSTANCING)
@@ -79,15 +72,21 @@ int main() {
 #endif
 
 	//just for testing
-	setup(mainShader);
-	skybox normSkybox;
-	normSkybox.init("assets/scene2/skyboxNorm");
+	setup2(mainShader);
+	//skybox normSkybox;
+	//normSkybox.init("assets/scene2/skyboxNorm");
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
 
 	//runs the one time initialization code of each gameObject object.
 	for (int i = 0; i < allObjects.size(); i++) allObjects[i]->runtimeInit();
+
+	glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
+	lightSource dir(glm::vec3(0.0f, 0.0f, 0.0f), dirLightV, glm::vec3(1.0f, 1.0f, 1.0f), 0.3f);
+	lightSource point(glm::vec3(-1.0f, 5.0f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f);
+	point.visualize(true);
+	dir.visualize(true);
 
 	glfwSetTime(0);
 
@@ -122,7 +121,7 @@ int main() {
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camPos, camPos + camFront, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		activeSkybox->update(viewMatrix, projectionMatrix);
+		if(activeSkybox != nullptr) activeSkybox->update(viewMatrix, projectionMatrix);
 
 		mainShader.use();
 
@@ -132,21 +131,15 @@ int main() {
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(viewMatrix));
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(projectionMatrix));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-		glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
-		float pointLight[] = { 0.0f, 0.0f, 0.0f, -1.0f, 1.5f, -0.5f, 0.5f, 0.5f, 0.5f, 0.3f };
-		float dirLight[] = { dirLightV.x, dirLightV.y, dirLightV.z, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.3f };
-		float ambient = 0.8f;
-
-		glBindBuffer(GL_UNIFORM_BUFFER, environmentalUniforms);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, 16, glm::value_ptr(camPos));
-		glBufferSubData(GL_UNIFORM_BUFFER, 16, 64, pointLight);
-		glBufferSubData(GL_UNIFORM_BUFFER, 80, 64, dirLight);
-		glBufferSubData(GL_UNIFORM_BUFFER, 144, 4, &ambient);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		
+#ifndef DISABLE_LIGHTING
+		for (lightSource* light : allLights) {
+			light->bind(mainShader, camPos);
+		}
+		mainShader.uniform(float1, "ambientStrength", {0.6f});
+#endif
+
 		mainShader.uniformBlock("matrices", 0);
-		mainShader.uniformBlock("environment", 1);
 
 		for (int i = 0; i < allObjects.size(); i++) {
 			allObjects[i]->update();
@@ -156,6 +149,7 @@ int main() {
 		glfwPollEvents();
 
 		for (int i = 0; i < allObjects.size(); i++)	allObjects[i]->postFrameCleanup();
+		lightSource::postFrameCleanup();
 
 		deltaTime = glfwGetTime() - currentTime;
 	}

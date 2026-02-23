@@ -267,20 +267,13 @@ void model::drawInstanced(shader& Shader, unsigned int numInstances) {
 	}
 }
 
-void model::modelSimple(objects3D shape, std::string path) {
-
-}
-void model::modelSimple(objects3D shape) {
-
-}
-
 std::vector<Mesh> model::getModelMesh() { return meshes; }
 
 ///
 //----------For skybox class----------
 ///
 std::vector<skybox*> savedSkyboxes;
-skybox* activeSkybox;
+skybox* activeSkybox = nullptr;
 
 void skybox::init(const std::string imageFolder) {
 	std::cout << "LOADING: Skybox from folder: " << imageFolder << std::endl;
@@ -303,7 +296,7 @@ void skybox::init(const std::string imageFolder) {
 			return;
 		}
 		else {
-			std::cout << "LOADING: Skybox image " << i << std::endl;
+			std::cout << "LOADING: Skybox image " << i << ':' << faceName[i] << std::endl;
 
 			switch (nC) {
 			case 1:
@@ -326,7 +319,7 @@ void skybox::init(const std::string imageFolder) {
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, x, y, 0, format, GL_UNSIGNED_BYTE, data);
 
-			std::cout << "SUCCESSFUL: Skybox image " << i << std::endl;
+			std::cout << "SUCCESSFUL: Skybox image " << i << ':' << faceName[i] << std::endl;
 		}
 
 		stbi_image_free(data);

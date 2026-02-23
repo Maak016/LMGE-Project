@@ -157,6 +157,8 @@
     <None Include="assets\scene1\backpack\backpack.mtl" />
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="shaders\lightSource.lmf" />
+    <None Include="shaders\lightSource.lmv" />
     <None Include="shaders\main.lmf" />
     <None Include="shaders\main.lmv" />
     <None Include="shaders\noInstancing.lmv" />

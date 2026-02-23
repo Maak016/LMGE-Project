@@ -48,8 +48,6 @@ public:
 	void init(std::string path);
 	model();
 	model(std::string path);
-	void modelSimple(objects3D shape, std::string texturePath);
-	void modelSimple(objects3D shape);
 	void draw(shader& Shader, glm::mat4& modelMatrix);
 	void drawInstanced(shader& shader, unsigned int numInstances);
 

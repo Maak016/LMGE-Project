@@ -46,8 +46,7 @@ public:
 
 	void collisionState(bool state, unsigned int collideeIndex, instance* collider);
 	void enableCollision(bool val);
-	std::vector<std::vector<glm::vec3>> hitbox();
-	void enableShowHitbox(bool state);
+	std::vector<std::vector<glm::vec3>> hitbox(); 
 
 	glm::vec3 getPos(const unsigned int index);
 	glm::vec3 getRot(const unsigned int index);

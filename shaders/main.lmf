@@ -11,13 +11,10 @@ in vec3 normal;
 in vec3 fragPos;
 in vec2 texCoords;
 
-layout(std140) uniform environment {
-	vec3 camPos;
-	lightSource pointLight;
-	lightSource dirLight;
-	float ambientStrength;
-};
-
+uniform vec3 camPos;
+uniform lightSource pointLight[30];
+uniform lightSource dirLight[30];
+uniform float ambientStrength;
 
 uniform sampler2D tex_diffuse1;
 uniform sampler2D tex_diffuse2;
@@ -36,41 +33,53 @@ vec3 getDirLightAmbient(lightSource light) {
 	return light.color * light.ambient * vec3(texture(tex_diffuse1, texCoords));
 }
 
-vec3 getPointLightDiffuse(lightSource light) {
+vec3 getPointLightDiffuse(lightSource light, vec3 norm) {
 	vec3 lightDir = normalize(light.pos - fragPos);
-	float strength = max(dot(lightDir, normal), 0.0f);
+	float strength = max(dot(lightDir, norm), 0.0f);
 
 	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
 }
-vec3 getDirLightDiffuse(lightSource light) {
-	float strength = max(dot(-light.dir, normal), 0.0f);
+vec3 getDirLightDiffuse(lightSource light, vec3 norm) {
+	float strength = max(dot(- light.dir, norm), 0.0f);
 
 	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
 }
 
-vec3 getPointLightSpecular(lightSource light) {
+vec3 getPointLightSpecular(lightSource light, vec3 norm) {
 	vec3 viewDir = normalize(camPos - fragPos);
 	vec3 lightDir = normalize(light.pos - fragPos);
 
-	vec3 R = reflect(-lightDir, normal);
+	vec3 R = reflect(-lightDir, norm);
 	float strength = max(dot(R, viewDir), 0.0f);
 
 	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
 }
-vec3 getDirLightSpecular(lightSource light) {
+vec3 getDirLightSpecular(lightSource light, vec3 norm) {
 	vec3 viewDir = normalize(camPos - fragPos);
 	vec3 lightDir = normalize(light.dir);
 
-	vec3 R = reflect(lightDir, normal);
+	vec3 R = reflect(lightDir, norm);
 	float strength = max(dot(R, viewDir), 0.0f);
 
 	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
 }
 
 void main() {
-	vec3 ambient = getPointLightAmbient(pointLight) + getDirLightAmbient(dirLight);
-	vec3 diffuse = getPointLightDiffuse(pointLight) + getDirLightDiffuse(dirLight); 
-	vec3 specular = getPointLightSpecular(pointLight) + getDirLightSpecular(dirLight);
+	vec3 ambient = vec3(0.0f, 0.0f, 0.0f);
+	vec3 diffuse = vec3(0.0f, 0.0f, 0.0f);
+	vec3 specular = vec3(0.0f, 0.0f, 0.0f);
 
-	fragColor = vec4(ambient.xyz + diffuse.xyz + specular.xyz, 1.0f) * texture(tex_diffuse1, texCoords);
+	for(int i = 0; i < pointLight.length(); i++){
+		ambient += getPointLightAmbient(pointLight[i]);
+		diffuse += getPointLightDiffuse(pointLight[i], normal);
+		specular += getPointLightSpecular(pointLight[i], normal);
+	}
+	for(int i = 0; i < dirLight.length(); i++){
+		ambient += getDirLightAmbient(dirLight[i]);
+		diffuse += getDirLightDiffuse(dirLight[i], normal);
+		specular += getDirLightSpecular(dirLight[i], normal); 
+	}
+	ambient *= ambientStrength;
+
+	fragColor = vec4(ambient + diffuse + specular, 1.0f) * texture(tex_diffuse1, texCoords);
 }
