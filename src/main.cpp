@@ -32,7 +32,7 @@ void setup2(shader& s) {
 	model backpack("assets/scene1/backpack/backpack.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 50.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -84,7 +84,7 @@ int main() {
 
 	glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
 	lightSource dir(glm::vec3(0.0f, 0.0f, 0.0f), dirLightV, glm::vec3(1.0f, 1.0f, 1.0f), 0.3f);
-	lightSource point(glm::vec3(-1.0f, 5.0f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f);
+	lightSource point(glm::vec3(-5.5f, 1.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f);
 	point.visualize(true);
 	dir.visualize(true);
 

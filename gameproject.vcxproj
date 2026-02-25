@@ -150,7 +150,6 @@
     <ClInclude Include="include\maths.h" />
     <ClInclude Include="include\modelLoading.h" />
     <ClInclude Include="include\shader.h" />
-    <ClInclude Include="include\shapes.h" />
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
@@ -163,7 +162,6 @@
     <None Include="shaders\main.lmv" />
     <None Include="shaders\noInstancing.lmv" />
     <None Include="shaders\noLighting.lmf" />
-    <None Include="shaders\noTexture.lmf" />
     <None Include="shaders\cubemapRenderer.lmf" />
     <None Include="shaders\cubemapRenderer.lmv" />
     <None Include="toDoList.md" />

@@ -40,28 +40,28 @@ vec3 getPointLightDiffuse(lightSource light, vec3 norm) {
 	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
 }
 vec3 getDirLightDiffuse(lightSource light, vec3 norm) {
-	float strength = max(dot(- light.dir, norm), 0.0f);
+	float strength = max(dot(light.dir, norm), 0.0f);
 
 	return light.color * strength * vec3(texture(tex_diffuse1, texCoords));
 }
 
-vec3 getPointLightSpecular(lightSource light, vec3 norm) {
+vec3 getPointLightSpecular(lightSource light, vec3 norm, vec3 camPos, vec3 fragPos) {
 	vec3 viewDir = normalize(camPos - fragPos);
 	vec3 lightDir = normalize(light.pos - fragPos);
 
 	vec3 R = reflect(-lightDir, norm);
 	float strength = max(dot(R, viewDir), 0.0f);
 
-	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
+	return pow(strength, 32) * light.color * vec3(texture(tex_specular1, texCoords));
 }
-vec3 getDirLightSpecular(lightSource light, vec3 norm) {
+vec3 getDirLightSpecular(lightSource light, vec3 norm, vec3 camPos, vec3 fragPos) {
 	vec3 viewDir = normalize(camPos - fragPos);
 	vec3 lightDir = normalize(light.dir);
 
-	vec3 R = reflect(lightDir, norm);
+	vec3 R = reflect(-lightDir, norm);
 	float strength = max(dot(R, viewDir), 0.0f);
 
-	return pow(strength, 64) * light.color * vec3(texture(tex_specular1, texCoords));
+	return pow(strength, 32) * light.color * vec3(texture(tex_specular1, texCoords));
 }
 
 void main() {
@@ -72,14 +72,14 @@ void main() {
 	for(int i = 0; i < pointLight.length(); i++){
 		ambient += getPointLightAmbient(pointLight[i]);
 		diffuse += getPointLightDiffuse(pointLight[i], normal);
-		specular += getPointLightSpecular(pointLight[i], normal);
+		specular += getPointLightSpecular(pointLight[i], normal, camPos, fragPos);
 	}
 	for(int i = 0; i < dirLight.length(); i++){
 		ambient += getDirLightAmbient(dirLight[i]);
 		diffuse += getDirLightDiffuse(dirLight[i], normal);
-		specular += getDirLightSpecular(dirLight[i], normal); 
+		specular += getDirLightSpecular(dirLight[i], normal, camPos, fragPos); 
 	}
 	ambient *= ambientStrength;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.0f) * texture(tex_diffuse1, texCoords);
+	fragColor = vec4(ambient + diffuse + specular, 1.0f);
 }

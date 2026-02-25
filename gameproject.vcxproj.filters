@@ -59,9 +59,6 @@
     <ClInclude Include="include\gameObj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\shapes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\maths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -73,7 +70,6 @@
     <None Include="toDoList.md" />
     <None Include="LICENSE" />
     <None Include="README.md" />
-    <None Include="shaders\noTexture.lmf" />
     <None Include="shaders\noLighting.lmf" />
     <None Include="shaders\noInstancing.lmv" />
     <None Include="shaders\cubemapRenderer.lmf" />

@@ -1,2 +1,22 @@
-﻿  shader.cpp
+﻿  yes.cpp
+  gameObj.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(18,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(50,56): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  inputSystem.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(17,19): warning C4305: 'initializing': truncation from 'double' to 'const float'
+  main.cpp
+  maths.cpp
+  modelLoading.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(64,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(92,52): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(156,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(186,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(190,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(198,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(212,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(215,21): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(341,37): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  shader.cpp
+  Generating Code...
+  glad.c
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

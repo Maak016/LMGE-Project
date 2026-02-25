@@ -6,8 +6,6 @@
 #include "assimp/postprocess.h"
 #include "shader.h"
 
-enum objects3D {CUBE, SPHERE, PYRAMID };
-
 struct Texture {
 	unsigned int ID;
 	std::string path;
@@ -48,6 +46,7 @@ public:
 	void init(std::string path);
 	model();
 	model(std::string path);
+	void initPrimitive();
 	void draw(shader& Shader, glm::mat4& modelMatrix);
 	void drawInstanced(shader& shader, unsigned int numInstances);
 

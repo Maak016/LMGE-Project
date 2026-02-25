@@ -1,5 +1,4 @@
 #include "gameObj.h"
-#include "shapes.h"
 
 std::vector<gameObject*> allObjects;
 
@@ -201,9 +200,9 @@ void gameObject::bindInstanceModel() {
 		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
 		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
-		for (int i = 3; i <= 6; i++) {
-			glEnableVertexAttribArray(i);
-			glVertexAttribDivisor(i, 1);
+		for (int j = 3; j <= 6; j++) {
+			glEnableVertexAttribArray(j);
+			glVertexAttribDivisor(j, 1);
 		}
 
 		glBindVertexArray(0);

@@ -88,8 +88,8 @@ void Mesh::drawInstanced(shader& Shader, unsigned int numInstances) {
 		Shader.uniform(int1, current.name + num, { static_cast<float>(i) });
 		num.clear();
 	}
-
-	glDrawElementsInstanced(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT, 0, numInstances);
+   
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, numInstances);
 	glBindVertexArray(0);
 }
 

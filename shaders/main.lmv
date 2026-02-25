@@ -21,5 +21,5 @@ void main() {
 
 	texCoords = texCoordIn;
 	normal = normalize(mat3( transpose(inverse(modelMatrix)) ) * normalIn);
-	fragPos = vec3(model * vec4(localPos, 1.0f));
+	fragPos = vec3(modelMatrix * vec4(localPos, 1.0f));
 }
