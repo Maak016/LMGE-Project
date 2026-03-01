@@ -1,5 +1,7 @@
 #include "fundamental.h"
 
+#include "maths.h"
+
 /* TO DO LIST WITH THIS FILE
 *  - 05/02/2025: Fix Memory leak caused by undeleted pointers (dev was too lazy to fix on 5/2/2025 lmao)
 */
@@ -214,4 +216,118 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 
 	if (inXRange && inYRange && inZRange) return true;
 	return false;
+}
+
+bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {
+	//getting the array of meshes of each model for subsequent extraction of vertices and normal vectors
+	std::vector<Mesh> firstMesh = first->getModel().getModelMesh();
+	std::vector<Mesh> secMesh = second->getModel().getModelMesh();
+
+	std::vector<Vertex> firstVertices;
+	std::vector<Vertex> secVertices;
+
+	//retrieving the vertices from the meshes
+	for (Mesh& m : firstMesh) {
+		std::vector<Vertex> vertices = m.getVertices();
+		firstVertices.insert(firstVertices.end(), vertices.begin(), vertices.end());
+	}
+	for (Mesh& m : secMesh) {
+		std::vector<Vertex> vertices = m.getVertices();
+		secVertices.insert(secVertices.end(), vertices.begin(), vertices.end());
+	}
+
+	//getting the normal matrix to transform the normal vectors to world coords, which is the transpose of the inverse of the modelMatrix
+	glm::mat4 model1 = first->getPosMatrix(firstIndex);
+	glm::mat4 model2 = second->getPosMatrix(secIndex);
+
+	glm::mat3 normalMatrix1 = glm::mat3(glm::transpose(glm::inverse(model1)));
+	glm::mat3 normalMatrix2 = glm::mat3(glm::transpose(glm::inverse(model2)));
+
+	//getting normal vectors, which will be the axes for SAT tests
+	std::vector<glm::vec3> normal1, normal2;
+	std::vector<glm::vec3> axes;
+
+	for (Mesh& m : firstMesh) {
+		std::vector<glm::vec3> faceNormals = m.getFaceNormals();
+		normal1.insert(normal1.end(), faceNormals.begin(), faceNormals.end());
+	}
+	for (Mesh& m : secMesh) {
+		std::vector<glm::vec3> faceNormals = m.getFaceNormals();
+		normal2.insert(normal2.end(), faceNormals.begin(), faceNormals.end());
+	}
+
+	for (glm::vec3& vector : normal1) vector = normalMatrix1 * vector;
+	for (glm::vec3& vector : normal2) vector = normalMatrix2 * vector;
+
+	axes = normal1;
+	axes.insert(axes.end(), normal2.begin(), normal2.end());
+
+	//project the two polyhedra onto each of the previously found axes by getting the minimum and maximum dot product of axes with a vertices
+	for (int i = 0; i < axes.size(); i++) {
+		//projection value arrays defined in this format: {minDot, maxDot}
+		float defaultVal1 = glm::dot(glm::vec3(model1 * glm::vec4(firstVertices[0].coords, 1.0f)), axes[i]);
+		float defaultVal2 = glm::dot(glm::vec3(model2 * glm::vec4(secVertices[0].coords, 1.0f)), axes[i]);
+
+		float projection1[2] = { defaultVal1, defaultVal1 };
+		float projection2[2] = { defaultVal2, defaultVal2 };
+
+		for (Vertex& v : firstVertices) {
+			glm::vec3 pos = glm::vec3(model1 * glm::vec4(v.coords, 1.0f));
+
+			float dotProduct = glm::dot(pos, axes[i]);
+			if (dotProduct < projection1[0]) projection1[0] = dotProduct;
+			else if (dotProduct > projection1[1]) projection1[1] = dotProduct;
+		}
+		for (Vertex& v : secVertices) {
+			glm::vec3 pos = glm::vec3(model2 * glm::vec4(v.coords, 1.0f));
+
+			float dotProduct = glm::dot(pos, axes[i]);
+			if (dotProduct < projection2[0]) projection2[0] = dotProduct;
+			else if (dotProduct > projection2[1]) projection2[1] = dotProduct;
+		}
+
+		//return true if overlap between the two projections is found.
+		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
+	}
+
+	//test failed --> next set of axes: the cross product of each normal vector of one object with each normal vector of the other object
+	axes.clear();	//clear the previous set of axes for a new set
+
+	//getting the axes
+	for (int i = 0; i < normal1.size(); i++) {
+		for (int j = 0; j < normal2.size(); j++) {
+			axes.push_back(glm::normalize(glm::cross(normal1[i], normal2[j])));
+		}
+	}
+
+	//project the two polyhedra onto each of the previously found axes by getting the minimum and maximum dot product of axes with a vertices
+	for (int i = 0; i < axes.size(); i++) {
+		//projection value arrays defined in this format: {minDot, maxDot}
+		float defaultVal1 = glm::dot(glm::vec3(model1 * glm::vec4(firstVertices[0].coords, 1.0f)), axes[i]);
+		float defaultVal2 = glm::dot(glm::vec3(model2 * glm::vec4(secVertices[0].coords, 1.0f)), axes[i]);
+
+		float projection1[2] = { defaultVal1, defaultVal1 };
+		float projection2[2] = { defaultVal2, defaultVal2 };
+
+		for (Vertex& v : firstVertices) {
+			glm::vec3 pos = glm::vec3(model1 * glm::vec4(v.coords, 1.0f));
+
+			float dotProduct = glm::dot(pos, axes[i]);
+			if (dotProduct < projection1[0]) projection1[0] = dotProduct;
+			else if (dotProduct > projection1[1]) projection1[1] = dotProduct;
+		}
+		for (Vertex& v : secVertices) {
+			glm::vec3 pos = glm::vec3(model2 * glm::vec4(v.coords, 1.0f));
+
+			float dotProduct = glm::dot(pos, axes[i]);
+			if (dotProduct < projection2[0]) projection2[0] = dotProduct;
+			else if (dotProduct > projection2[1]) projection2[1] = dotProduct;
+		}
+
+		//return true if overlap between the two projections is found.
+		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
+	}
+
+	//std::cout << "yes";
+	return true;
 }

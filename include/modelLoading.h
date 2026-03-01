@@ -22,6 +22,8 @@ private:
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 
+	std::vector<glm::vec3> faceNormals;
+
 	unsigned int VAO, VBO, EBO;
 public:
 	void setup();
@@ -30,6 +32,9 @@ public:
 	void drawInstanced(shader& Shader, unsigned int numInstances);
 
 	unsigned int getVertexArray();
+	std::vector<Vertex> getVertices();
+	void loadFaceNormals();
+	std::vector<glm::vec3> getFaceNormals();
 };
 
 class model {
@@ -51,6 +56,7 @@ public:
 	void drawInstanced(shader& shader, unsigned int numInstances);
 
 	std::vector<Mesh> getModelMesh();
+	void loadFaceNormals();
 };
 
 class skybox {

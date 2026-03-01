@@ -18,8 +18,6 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "maths.h"
-
 //#define DEBUGMODE
 //#define DISABLE_LIGHTING
 //#define DISABLE_INSTANCING

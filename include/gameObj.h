@@ -52,6 +52,8 @@ public:
 	glm::vec3 getRot(const unsigned int index);
 	glm::mat4 getPosMatrix(const unsigned int index);
 	shader getRenderShader();
+
+	model getModel();
 };
 
 extern std::vector<gameObject*> allObjects;

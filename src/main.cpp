@@ -21,18 +21,39 @@ std::vector<glm::vec3> cube = {
 bool move = false;
 gameObject testingObject;
 void setup(shader& s) {
-	model backpack("assets/scene2/Castle/Castle OBJ.obj");
+	model backpack("assets/scene2/box/box.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(30.0f, -26.0f, 25.0f), glm::vec3(0.0f, 50.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+}
+gameObject testingObject1;
+void setup3(shader& s) {
+	model backpack("assets/scene2/box/box.obj");
+	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+
+	testingObject.instantiate(glm::vec3(3.4f, 0.0f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+}
+gameObject testingObject2;
+void setup4(shader& s) {
+	model backpack("assets/scene2/box/box.obj");
+	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+
+	testingObject.instantiate(glm::vec3(3.4f, -0.2f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+}
+gameObject testingObject3;
+void setup5(shader& s) {
+	model backpack("assets/scene2/box/box.obj");
+	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+
+	testingObject.instantiate(glm::vec3(3.4f, -25.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 gameObject another;
 void setup2(shader& s) {
-	model backpack("assets/scene1/backpack/backpack.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	model backpack("assets/scene2/box/box.obj");
+	another.init(backpack, s, nullptr, nullptr, { cube });
 
-	testingObject.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -72,9 +93,14 @@ int main() {
 #endif
 
 	//just for testing
+	setup(mainShader);
 	setup2(mainShader);
-	//skybox normSkybox;
-	//normSkybox.init("assets/scene2/skyboxNorm");
+	setup3(mainShader);
+	setup4(mainShader);
+	setup5(mainShader);
+	
+	skybox normSkybox;
+	normSkybox.init("assets/scene2/skyboxNorm");
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -131,7 +157,7 @@ int main() {
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(viewMatrix));
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(projectionMatrix));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		
+
 #ifndef DISABLE_LIGHTING
 		for (lightSource* light : allLights) {
 			light->bind(mainShader, camPos);

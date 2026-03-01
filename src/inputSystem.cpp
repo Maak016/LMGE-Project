@@ -62,7 +62,7 @@ void inputHandler(GLFWwindow* window) {
 		moveVector += groundMovement * static_cast<float>(moveSpeedNorm * deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) && !jumping) {
-		moveVector += camUp * static_cast<float>(jumpStrength * deltaTime);
+		moveVector += camUp * static_cast<float>(jumpStrength * deltaTime * 10);
 	}
 
 	camPos += moveVector;

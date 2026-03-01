@@ -1,7 +1,7 @@
 #pragma once
 
-#define LM_MATHS
-#include "fundamental.h"
+#include "fundamental.h" 
+#include "gameObj.h"
 
 enum feasibleRegionOp {null, less, greater};
 
@@ -23,3 +23,5 @@ std::vector<segment*> genSegments(std::vector<std::vector<glm::vec3>> vertices);
 linearEquation* linearEqFromSegment(segment* s);
 bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<segment*> shape);
 glm::vec2 getIntersection(linearEquation* first, linearEquation* second);
+
+bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex);

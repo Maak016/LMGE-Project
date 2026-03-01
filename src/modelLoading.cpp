@@ -94,6 +94,34 @@ void Mesh::drawInstanced(shader& Shader, unsigned int numInstances) {
 }
 
 unsigned int Mesh::getVertexArray() { return VAO; }
+std::vector<Vertex> Mesh::getVertices() { return vertices; }
+
+void Mesh::loadFaceNormals() {
+	std::cout << "LOADING: Mesh face normal vectors for collision handling." << std::endl;
+
+	std::vector<glm::vec3> result;
+
+	for (Vertex& v : vertices) {
+		bool loaded = false;
+		for (glm::vec3& vector : result)
+			if (vector == v.normals || -vector == v.normals) {
+				loaded = true;
+				break;
+			}
+
+		if (!loaded) result.push_back(v.normals);
+	}
+
+	this->faceNormals = result;
+	std::cout << "SUCCESSFUL: Mesh face normals loading. Number of vectors: " << result.size() << std::endl;
+}
+std::vector<glm::vec3> Mesh::getFaceNormals() { return faceNormals; }
+
+void model::loadFaceNormals() {
+	for (int i = 0; i < meshes.size(); i++) {
+		meshes[i].loadFaceNormals();
+	}
+}
 
 //to import texture from a file and return the openGL texture object, to be used in assimp material procession
 unsigned int model::importTexture(const std::string path) {
@@ -241,6 +269,10 @@ model::model(std::string path) {
 
 	processNode(scene->mRootNode, scene);
 	std::cout << "SUCCESSFUL: Assimp node procession from path: " << path << std::endl;
+
+	loadFaceNormals();
+	std::cout << "SUCCESSFUL: Model loading from path: " << path << std::endl;
+	std::cout << std::endl;
 }
 
 void model::init(std::string path) {
@@ -254,6 +286,10 @@ void model::init(std::string path) {
 
 	processNode(scene->mRootNode, scene);
 	std::cout << "SUCCESSFUL: Assimp node procession from path: " << path << std::endl;
+
+	loadFaceNormals();
+	std::cout << "SUCCESSFUL: Model loading from path: " << path << std::endl;
+	std::cout << std::endl;
 }
 
 void model::draw(shader& Shader, glm::mat4& modelMatrix) {

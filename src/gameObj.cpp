@@ -1,4 +1,5 @@
 #include "gameObj.h"
+#include "maths.h"
 
 std::vector<gameObject*> allObjects;
 
@@ -8,11 +9,13 @@ void gameObject::init(model objectModel, shader renderShader, void(*init)(void),
 	this->updateFunc = update;
 	this->renderShader = renderShader;
 
-	if (!col.empty()) {
-		hitboxRegion = col;
-		collidable = true;
-	}
-	else collidable = false;
+	//if (!col.empty()) {
+		//hitboxRegion = col;
+		//collidable = true;
+	//}
+	//else collidable = false;
+
+	collidable = true;
 	
 	allObjects.push_back(this);
 	this->objectID = allObjects.size();
@@ -52,11 +55,10 @@ void gameObject::update() {
 	for(int i = 0; i < instances.size(); i++)
 		if (collidable) {
 			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
-				std::cout << "Collision = TRUE" << std::endl;
-
 				if (onCollision != nullptr) onCollision();
 			}
 		}
+
 #endif
 }
 void gameObject::postFrameCleanup() {
@@ -94,6 +96,17 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 		for (int j = 0; j < all[i]->instances.size(); j++) {
 			//check for collision: returns true if the coordinates of the two objects have a common area.
 			bool collision = false;
+
+#ifndef LEGACY_COLLISION
+			if (separatingAxisTest(this, all[i], colliderIndex, j)) {
+				all[i]->collisionState(true, j, &this->instances[colliderIndex]);
+
+				this->instances[colliderIndex].colliding = true;
+				this->instances[colliderIndex].collidees.push_back(&all[i]->instances[j]);
+
+				collision = true;
+			}
+#else
 
 			//iterate through each point forming the hitbox of the (possible) collidee and check if it is inside the current instance
 				//transform the hitbox region (in local coords) to the collidees coords first
@@ -135,6 +148,8 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 				}
 			}
 
+#endif
+
 			//move on to the next iteration if no collision between the two instances detected
 			if (!collision) continue;
 			outputObj.push_back(&all[i]->instances[j]);
@@ -169,6 +184,7 @@ glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
 }
 
 shader gameObject::getRenderShader() { return renderShader; }
+model gameObject::getModel() { return objectModel; }
 
 std::vector<glm::mat4> gameObject::getInstanceModel() {
 	std::vector<glm::mat4> result;
