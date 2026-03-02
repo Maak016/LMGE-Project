@@ -71,15 +71,17 @@ private:
 	shader skyboxRenderer;
 
 	std::string directory;
+	std::string fileFormat;
 
 	unsigned int boxVAO, boxVBO;
 
 	std::vector<std::string> faceName =
-	{ "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg" };
+	{ "right", "left", "top", "bottom", "front", "back" };
 public:
 	unsigned int getID();
 
 	void init(const std::string imageFolder);
+	void init(const std::string imageFolder, const std::string imageFormat);
 	void makeActive();
 	static void makeActive(const unsigned int skyboxID);
 

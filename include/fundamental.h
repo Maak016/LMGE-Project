@@ -24,3 +24,7 @@
 //#define LEGACY_COLLISION
 
 extern double deltaTime;
+
+namespace engine {
+	void terminate();
+}

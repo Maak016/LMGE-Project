@@ -3,6 +3,8 @@
 #include "inputSystem.h"
 #include "gameObj.h"
 
+bool engineTerminated = false;
+
 double deltaTime = 0;
 double currentTime = 0;
 
@@ -12,17 +14,12 @@ const int scrHeight = 720;
 bool mouseInput = false;
 bool released = true;
 
-//hitbox region
-std::vector<glm::vec3> cube = {
-	glm::vec3(-0.3f, 0.3f, 0.5f), glm::vec3(0.3f, 0.3f, 0.3f), glm::vec3(0.3f, -0.3f, 0.3f), glm::vec3(-0.3f, -0.3f, 0.3f),
-	glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f), glm::vec3(-0.3f, -0.3f, -0.3f)
-};
-
+void engine::terminate() { engineTerminated = true; }
 
 gameObject testingObject;
 void setup(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject.init(backpack, s, nullptr, nullptr, nullptr);
 	//testingObject.setAxisAlignedHitbox(true);
 
 	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(30.0f, 40.0f, 0.0f));
@@ -30,7 +27,7 @@ void setup(shader& s) {
 gameObject testingObject1;
 void setup3(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject1.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject1.init(backpack, s, nullptr, nullptr, nullptr);
 	//testingObject1.setAxisAlignedHitbox(true);
 
 	testingObject1.instantiate(glm::vec3(3.4f, 0.0f, 3.7f), glm::vec3(15.0f, 4.0f, 0.0f));
@@ -38,7 +35,7 @@ void setup3(shader& s) {
 gameObject testingObject2;
 void setup4(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject2.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject2.init(backpack, s, nullptr, nullptr, nullptr);
 	//testingObject2.setAxisAlignedHitbox(true);
 
 	testingObject2.instantiate(glm::vec3(3.4f, -0.2f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -46,7 +43,7 @@ void setup4(shader& s) {
 gameObject testingObject3;
 void setup5(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject3.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject3.init(backpack, s, nullptr, nullptr, nullptr);
 	//testingObject3.setAxisAlignedHitbox(true);
 
 	testingObject3.instantiate(glm::vec3(3.4f, -25.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -55,7 +52,7 @@ void setup5(shader& s) {
 gameObject another;
 void setup2(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	another.init(backpack, s, nullptr, nullptr, { cube });
+	another.init(backpack, s, nullptr, nullptr, nullptr);
 	//another.setAxisAlignedHitbox(true);
 
 	another.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -81,6 +78,7 @@ int main() {
 		return -1;
 	}
 	else std::cout << "SUCCESSFUL: OpenGL Loader." << std::endl;
+	std::cout << std::endl;
 
 	unsigned int matricesBlock;
 	glGenBuffers(1, &matricesBlock);
@@ -105,7 +103,7 @@ int main() {
 	//setup5(mainShader);
 	
 	skybox normSkybox;
-	normSkybox.init("assets/scene2/skyboxNorm");
+	normSkybox.init("assets/scene2/skyboxNorm", ".jpg");
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -123,6 +121,12 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(mainWindow)) {
+		if (engineTerminated) {
+			std::cout << std::endl;
+			std::cout << "ERROR: LMGE: ENGINE TERMINATED" << std::endl;
+			return -1;
+		}
+
 		currentTime = glfwGetTime();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

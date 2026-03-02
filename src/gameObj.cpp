@@ -4,24 +4,47 @@
 std::vector<gameObject*> allObjects;
 
 void gameObject::init(model objectModel, shader renderShader, void(*init)(void), void(*update)(void), std::vector<std::vector<glm::vec3>> col) {
+#ifndef LEGACY_COLLISION
+	std::cout << "WARNING: Legacy gameObject initialization function used while Legacy Collision system is disabled. The hitbox Region param will not have any effect" << std::endl;
+#endif
+
 	this->objectModel = objectModel;
 	this->initFunc = init;
 	this->updateFunc = update;
 	this->renderShader = renderShader;
 
-	//if (!col.empty()) {
-		//hitboxRegion = col;
-		//collidable = true;
-	//}
-	//else collidable = false;
-
-	collidable = true;
+	if (!col.empty()) {
+		hitboxRegion = col;
+		collidable = true;
+	}
+	else collidable = false;
 	
 	allObjects.push_back(this);
 	this->objectID = allObjects.size();
 }
 
+void gameObject::init(model objectModel, shader renderShader, void(*init)(void), void(*update)(void), model* colliderModel) {
+	this->objectModel = objectModel;
+	this->initFunc = init;
+	this->updateFunc = update;
+	this->renderShader = renderShader;
+
+	if (colliderModel != nullptr) {
+		this->collider = *colliderModel;
+		colliderModelDefined = true;
+	}
+	collidable = true;
+
+	allObjects.push_back(this);
+	this->objectID = allObjects.size();
+}
+
 void gameObject::update() {
+	if (collidable && isTrigger) {
+		std::cout << "ERROR: Game Object cannot both be trigger and collidable." << std::endl;
+		engine::terminate();
+	}
+
 	if (updateFunc != nullptr)
 	updateFunc();
 
@@ -54,6 +77,11 @@ void gameObject::update() {
 
 	for(int i = 0; i < instances.size(); i++)
 		if (collidable) {
+			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
+				if (onCollision != nullptr) onCollision();
+			}
+		}
+		else if (isTrigger) {
 			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
 				if (onCollision != nullptr) onCollision();
 			}
@@ -163,6 +191,11 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 
 void gameObject::enableCollision(bool val) {
 	collidable = val;
+	if (val) isTrigger = false;
+}
+void gameObject::makeTrigger(bool val) {
+	isTrigger = val;
+	if (val) collidable = false;
 }
 
 glm::vec3 gameObject::getPos(const unsigned int index) {
@@ -185,7 +218,10 @@ glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
 }
 
 shader gameObject::getRenderShader() { return renderShader; }
-model gameObject::getModel() { return objectModel; }
+model gameObject::getModel() {
+	if (colliderModelDefined) return collider;
+	return objectModel;
+}
 
 std::vector<glm::mat4> gameObject::getInstanceModel() {
 	std::vector<glm::mat4> result;

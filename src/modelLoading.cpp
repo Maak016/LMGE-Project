@@ -345,7 +345,7 @@ void skybox::init(const std::string imageFolder) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	//loading skybox images
 	for (int i = 0; i < 6; i++) {
-		std::string filePath = imageFolder + '/' + faceName[i];
+		std::string filePath = imageFolder + '/' + faceName[i] + ".jpg";
 
 		int x, y, nC;
 		GLenum format, internalFormat;
@@ -356,7 +356,7 @@ void skybox::init(const std::string imageFolder) {
 			return;
 		}
 		else {
-			std::cout << "LOADING: Skybox image " << i << ':' << faceName[i] << std::endl;
+			std::cout << "LOADING: Skybox image " << i << ": " << faceName[i] << ".jpg" << std::endl;
 
 			switch (nC) {
 			case 1:
@@ -379,7 +379,7 @@ void skybox::init(const std::string imageFolder) {
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, x, y, 0, format, GL_UNSIGNED_BYTE, data);
 
-			std::cout << "SUCCESSFUL: Skybox image " << i << ':' << faceName[i] << std::endl;
+			std::cout << "SUCCESSFUL: Skybox image " << i << ": " << faceName[i] << ".jpg" << std::endl;
 		}
 
 		stbi_image_free(data);
@@ -414,6 +414,109 @@ void skybox::init(const std::string imageFolder) {
 
 		-0.5f, -0.5f, -0.5f,    -0.5f, -0.5f, 0.5f,    -0.5f, 0.5f, -0.5f,		//left side 
 		-0.5f, -0.5f, 0.5f,     -0.5f, 0.5f, -0.5f,    -0.5f, 0.5f, 0.5f, 
+
+		-0.5f, 0.5f, 0.5f,      0.5f, 0.5f, 0.5f,      -0.5f, 0.5f, -0.5f,		//top side
+		0.5f, 0.5f, 0.5f,       -0.5f, 0.5f, -0.5f,    0.5f, 0.5f, -0.5f,
+
+		-0.5f, -0.5f, -0.5f,    0.5f, -0.5f, -0.5f,    -0.5f, -0.5f, 0.5f,		//bottom side
+		0.5f, -0.5f, -0.5f,     -0.5f, -0.5f, 0.5f,    0.5f, -0.5f, 0.5f
+	};
+
+	skyboxRenderer.init("shaders/cubemapRenderer.lmv", "shaders/cubemapRenderer.lmf");
+
+	//setting up the vertex array
+	glGenVertexArrays(1, &boxVAO);
+	glBindVertexArray(boxVAO);
+
+	glGenBuffers(1, &boxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
+}
+
+void skybox::init(const std::string imageFolder, const std::string imageFormat) {
+	std::cout << "LOADING: Skybox from folder: " << imageFolder << std::endl;
+
+	stbi_set_flip_vertically_on_load(false);
+
+	glGenTextures(1, &textureID);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	//loading skybox images
+	for (int i = 0; i < 6; i++) {
+		std::string filePath = imageFolder + '/' + faceName[i] + imageFormat;
+
+		int x, y, nC;
+		GLenum format, internalFormat;
+		unsigned char* data = stbi_load(filePath.c_str(), &x, &y, &nC, 0);
+
+		if (!data) {
+			std::cout << "ERROR: Skybox image loading failed from path: " << filePath << std::endl;
+			return;
+		}
+		else {
+			std::cout << "LOADING: Skybox image " << i << ": " << faceName[i] << imageFormat << std::endl;
+
+			switch (nC) {
+			case 1:
+				format = GL_RED;
+				internalFormat = GL_RED;
+				break;
+			case 3:
+				format = GL_RGB;
+				internalFormat = GL_RGB8;
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+				break;
+			case 4:
+				format = GL_RGBA;
+				internalFormat = GL_RGBA8;
+				break;
+			default:
+				std::cout << "UNEXPECTED ERROR: More than 4 or fewer than 1 color component in skybox image file from path: " << filePath << std::endl;
+				return;
+			}
+
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, x, y, 0, format, GL_UNSIGNED_BYTE, data);
+
+			std::cout << "SUCCESSFUL: Skybox image " << i << ": " << faceName[i] << imageFormat << std::endl;
+		}
+
+		stbi_image_free(data);
+	}
+
+	//setting parameters
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	std::cout << "SUCCESSFUL: Skybox loading from folder: " << imageFolder << std::endl;
+
+	if (savedSkyboxes.size() == 0) activeSkybox = this;
+	savedSkyboxes.push_back(this);
+	this->skyboxID = savedSkyboxes.size();
+
+	//setting up the box on which the cube map will be applied to (sky"box" lol)
+	const float vertices[] =
+	{
+		-0.5f, -0.5f, 0.5f,     0.5f, -0.5f, 0.5f,     -0.5f, 0.5f, 0.5f,		//front side    
+		0.5f, -0.5f, 0.5f,      -0.5f, 0.5f, 0.5f,     0.5f, 0.5f, 0.5f,
+
+		0.5f, -0.5f, -0.5f,     -0.5f, -0.5f, -0.5f,   0.5f, 0.5f, -0.5f,		//back side
+		-0.5f, -0.5f, -0.5f,    0.5f, 0.5f, -0.5f,     -0.5f, 0.5f, -0.5f,
+
+		0.5f, -0.5f, 0.5f,      0.5f, -0.5f, -0.5f,    0.5f, 0.5f, 0.5f,		//right side 
+		0.5f, -0.5f, -0.5f,     0.5f, 0.5f, 0.5f,      0.5f, 0.5f, -0.5f,
+
+		-0.5f, -0.5f, -0.5f,    -0.5f, -0.5f, 0.5f,    -0.5f, 0.5f, -0.5f,		//left side 
+		-0.5f, -0.5f, 0.5f,     -0.5f, 0.5f, -0.5f,    -0.5f, 0.5f, 0.5f,
 
 		-0.5f, 0.5f, 0.5f,      0.5f, 0.5f, 0.5f,      -0.5f, 0.5f, -0.5f,		//top side
 		0.5f, 0.5f, 0.5f,       -0.5f, 0.5f, -0.5f,    0.5f, 0.5f, -0.5f,
