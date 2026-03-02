@@ -218,7 +218,13 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	return false;
 }
 
-bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {
+bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {\
+	//if the two objects' close proximity trigger (two spheres) do not overlap, the checking is skipped -> better performance
+	float r1 = first->getModel().getCloseProximityRadius();
+	float r2 = second->getModel().getCloseProximityRadius();
+
+	if (glm::length(first->instances[firstIndex].pos - second->instances[secIndex].pos) > r1 + r2) return false;
+
 	//getting the array of meshes of each model for subsequent extraction of vertices and normal vectors
 	std::vector<Mesh> firstMesh = first->getModel().getModelMesh();
 	std::vector<Mesh> secMesh = second->getModel().getModelMesh();
@@ -240,9 +246,6 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 	glm::mat4 model1 = first->getPosMatrix(firstIndex);
 	glm::mat4 model2 = second->getPosMatrix(secIndex);
 
-	glm::mat3 normalMatrix1 = glm::mat3(glm::transpose(glm::inverse(model1)));
-	glm::mat3 normalMatrix2 = glm::mat3(glm::transpose(glm::inverse(model2)));
-
 	//getting normal vectors, which will be the axes for SAT tests
 	std::vector<glm::vec3> normal1, normal2;
 	std::vector<glm::vec3> axes;
@@ -256,8 +259,15 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 		normal2.insert(normal2.end(), faceNormals.begin(), faceNormals.end());
 	}
 
-	for (glm::vec3& vector : normal1) vector = normalMatrix1 * vector;
-	for (glm::vec3& vector : normal2) vector = normalMatrix2 * vector;
+	//transforming the normal vectors with the normal matrix if the object is not axis-aligned
+	if (!first->axisAlignedHitboxState()) {
+		glm::mat3 normalMatrix1 = glm::mat3(glm::transpose(glm::inverse(model1)));
+		for (glm::vec3& vector : normal1) vector = normalMatrix1 * vector;
+	}
+	if (!second->axisAlignedHitboxState()) {
+		glm::mat3 normalMatrix2 = glm::mat3(glm::transpose(glm::inverse(model2)));
+		for (glm::vec3& vector : normal2) vector = normalMatrix2 * vector;
+	}
 
 	axes = normal1;
 	axes.insert(axes.end(), normal2.begin(), normal2.end());

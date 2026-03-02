@@ -10,6 +10,7 @@ private:
 	shader renderShader;
 	std::vector<std::vector<glm::vec3>> hitboxRegion;
 	bool displayHitbox = false;
+	bool axisAlignedHitbox = false;
 
 	void(*initFunc)(void) = nullptr;
 	void(*updateFunc)(void) = nullptr;
@@ -47,12 +48,15 @@ public:
 	void collisionState(bool state, unsigned int collideeIndex, instance* collider);
 	void enableCollision(bool val);
 	std::vector<std::vector<glm::vec3>> hitbox(); 
+	void setAxisAlignedHitbox(bool state);
+	bool axisAlignedHitboxState();
 
 	glm::vec3 getPos(const unsigned int index);
 	glm::vec3 getRot(const unsigned int index);
 	glm::mat4 getPosMatrix(const unsigned int index);
 	shader getRenderShader();
 
+	//getting the model used for collision of the object
 	model getModel();
 };
 

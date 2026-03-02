@@ -270,8 +270,11 @@ model::model(std::string path) {
 	processNode(scene->mRootNode, scene);
 	std::cout << "SUCCESSFUL: Assimp node procession from path: " << path << std::endl;
 
+#ifndef LEGACY_COLLISION
 	loadFaceNormals();
 	std::cout << "SUCCESSFUL: Model loading from path: " << path << std::endl;
+	loadCloseProxTrigger();
+#endif
 	std::cout << std::endl;
 }
 
@@ -287,8 +290,11 @@ void model::init(std::string path) {
 	processNode(scene->mRootNode, scene);
 	std::cout << "SUCCESSFUL: Assimp node procession from path: " << path << std::endl;
 
+#ifndef LEGACY_COLLISION
 	loadFaceNormals();
 	std::cout << "SUCCESSFUL: Model loading from path: " << path << std::endl;
+	loadCloseProxTrigger();
+#endif
 	std::cout << std::endl;
 }
 
@@ -304,6 +310,24 @@ void model::drawInstanced(shader& Shader, unsigned int numInstances) {
 }
 
 std::vector<Mesh> model::getModelMesh() { return meshes; }
+
+void model::loadCloseProxTrigger() {
+	float maxDistanceToCenter = 0;
+
+	for (Mesh& m : meshes) {
+		std::vector<Vertex> vertices = m.getVertices();
+
+		for (Vertex& v : vertices) {
+			float length = glm::length(v.coords);
+			if (length > maxDistanceToCenter) maxDistanceToCenter = length;
+		}
+	}
+
+	closeProximityTrigger = maxDistanceToCenter;
+
+	std::cout << "INFO: object's close proximity trigger radius: " << maxDistanceToCenter << std::endl;
+}
+float model::getCloseProximityRadius() { return this->closeProximityTrigger; }
 
 ///
 //----------For skybox class----------

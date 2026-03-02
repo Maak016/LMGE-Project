@@ -18,40 +18,45 @@ std::vector<glm::vec3> cube = {
 	glm::vec3(-0.3f, 0.3f, -0.3f), glm::vec3(0.3f, 0.3f, -0.3f), glm::vec3(0.3f, -0.3f, -0.3f), glm::vec3(-0.3f, -0.3f, -0.3f)
 };
 
-bool move = false;
+
 gameObject testingObject;
 void setup(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
 	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	//testingObject.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(30.0f, 40.0f, 0.0f));
 }
 gameObject testingObject1;
 void setup3(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject1.init(backpack, s, nullptr, nullptr, { cube });
+	//testingObject1.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, 0.0f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject1.instantiate(glm::vec3(3.4f, 0.0f, 3.7f), glm::vec3(15.0f, 4.0f, 0.0f));
 }
 gameObject testingObject2;
 void setup4(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject2.init(backpack, s, nullptr, nullptr, { cube });
+	//testingObject2.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, -0.2f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject2.instantiate(glm::vec3(3.4f, -0.2f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 gameObject testingObject3;
 void setup5(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	testingObject.init(backpack, s, nullptr, nullptr, { cube });
+	testingObject3.init(backpack, s, nullptr, nullptr, { cube });
+	//testingObject3.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, -25.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject3.instantiate(glm::vec3(3.4f, -25.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 gameObject another;
 void setup2(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
 	another.init(backpack, s, nullptr, nullptr, { cube });
+	//another.setAxisAlignedHitbox(true);
 
 	another.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
@@ -95,9 +100,9 @@ int main() {
 	//just for testing
 	setup(mainShader);
 	setup2(mainShader);
-	setup3(mainShader);
-	setup4(mainShader);
-	setup5(mainShader);
+	//setup3(mainShader);
+	//setup4(mainShader);
+	//setup5(mainShader);
 	
 	skybox normSkybox;
 	normSkybox.init("assets/scene2/skyboxNorm");

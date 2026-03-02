@@ -77,9 +77,10 @@ void gameObject::instantiate(float x, float y, float z, float rotX, float rotY, 
 	instances.push_back({this->objectID, pos, rot, false, false, {}});
 }
 
-std::vector<std::vector<glm::vec3>> gameObject::hitbox() {
-	return hitboxRegion;
-}
+std::vector<std::vector<glm::vec3>> gameObject::hitbox() { return hitboxRegion; }
+
+void gameObject::setAxisAlignedHitbox(bool state) { this->axisAlignedHitbox = state; }
+bool gameObject::axisAlignedHitboxState() { return this->axisAlignedHitbox; }
 
 //sets the collision state of an instace of another object, usually to "inform" the collidee that it has collided with the current object
 void gameObject::collisionState(bool state, unsigned int collideeIndex, instance* collider) {

@@ -43,6 +43,8 @@ private:
 	std::vector<Mesh> meshes;
 	std::vector<Texture> loadedTextures;
 	
+	float closeProximityTrigger;
+
 	std::vector<Texture> processMaterial(aiMaterial* mat, aiTextureType type, std::string typeName);
 	unsigned int importTexture(const std::string path);
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
@@ -57,6 +59,8 @@ public:
 
 	std::vector<Mesh> getModelMesh();
 	void loadFaceNormals();
+	void loadCloseProxTrigger();
+	float getCloseProximityRadius();
 };
 
 class skybox {
