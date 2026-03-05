@@ -55,7 +55,7 @@ void setup2(shader& s) {
 	another.init(backpack, s, nullptr, nullptr, nullptr);
 	//another.setAxisAlignedHitbox(true);
 
-	another.instantiate(glm::vec3(3.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(25.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -98,9 +98,9 @@ int main() {
 	//just for testing
 	setup(mainShader);
 	setup2(mainShader);
-	//setup3(mainShader);
-	//setup4(mainShader);
-	//setup5(mainShader);
+	setup3(mainShader);
+	setup4(mainShader);
+	setup5(mainShader);
 	
 	skybox normSkybox;
 	normSkybox.init("assets/scene2/skyboxNorm", ".jpg");
@@ -123,7 +123,7 @@ int main() {
 	while (!glfwWindowShouldClose(mainWindow)) {
 		if (engineTerminated) {
 			std::cout << std::endl;
-			std::cout << "ERROR: LMGE: ENGINE TERMINATED" << std::endl;
+			std::cout << "ERROR: LMGE: ENGINE TERMINATED." << std::endl;
 			return -1;
 		}
 
@@ -156,6 +156,7 @@ int main() {
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camPos, camPos + camFront, glm::vec3(0.0f, 1.0f, 0.0f));
 
+		glDisable(GL_CULL_FACE);
 		if(activeSkybox != nullptr) activeSkybox->update(viewMatrix, projectionMatrix);
 
 		mainShader.use();
@@ -173,6 +174,7 @@ int main() {
 		}
 		mainShader.uniform(float1, "ambientStrength", {0.6f});
 #endif
+		glEnable(GL_CULL_FACE);
 
 		mainShader.uniformBlock("matrices", 0);
 

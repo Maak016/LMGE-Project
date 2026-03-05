@@ -113,7 +113,7 @@ void Mesh::loadFaceNormals() {
 	}
 
 	this->faceNormals = result;
-	std::cout << "SUCCESSFUL: Mesh face normals loading. Number of vectors: " << result.size() << std::endl;
+	std::cout << "SUCCESSFUL: Mesh face normal loading. Number of vectors: " << result.size() << std::endl;
 }
 std::vector<glm::vec3> Mesh::getFaceNormals() { return faceNormals; }
 
@@ -548,7 +548,7 @@ void skybox::makeActive(const unsigned int skyboxID) { activeSkybox = savedSkybo
 void skybox::update(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) {
 #ifdef DEBUGMODE
 	std::cout << "--skybox properties--\n" << "Number of loaded skyboxes: " << savedSkyboxes.size()
-		<< "\nActive skybox ID: " << activeSkybox.getID() << std::endl;
+		<< "\nActive skybox ID: " << activeSkybox->getID() << std::endl;
 #endif
 
 	skyboxRenderer.use();
