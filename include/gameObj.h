@@ -65,6 +65,11 @@ public:
 
 	//getting the model used for collision of the object
 	model getModel();
+
+	void translate(const unsigned int instanceIndex, glm::vec3 dir, float mag);
+	void rotate(const unsigned int instanceIndex, glm::vec3 rotation);
+
+	bool trigger();
 };
 
 extern std::vector<gameObject*> allObjects;
