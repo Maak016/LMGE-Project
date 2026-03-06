@@ -24,4 +24,6 @@ linearEquation* linearEqFromSegment(segment* s);
 bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<segment*> shape);
 glm::vec2 getIntersection(linearEquation* first, linearEquation* second);
 
+extern float mtvMag;
+extern glm::vec3 mtvVec;
 bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex);

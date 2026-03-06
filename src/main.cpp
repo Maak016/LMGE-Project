@@ -24,38 +24,13 @@ void setup(shader& s) {
 
 	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(30.0f, 40.0f, 0.0f));
 }
-gameObject testingObject1;
-void setup3(shader& s) {
-	model backpack("assets/scene2/box/box.obj");
-	testingObject1.init(backpack, s, nullptr, nullptr, nullptr);
-	//testingObject1.setAxisAlignedHitbox(true);
-
-	testingObject1.instantiate(glm::vec3(3.4f, 0.0f, 3.7f), glm::vec3(15.0f, 4.0f, 0.0f));
-}
-gameObject testingObject2;
-void setup4(shader& s) {
-	model backpack("assets/scene2/box/box.obj");
-	testingObject2.init(backpack, s, nullptr, nullptr, nullptr);
-	//testingObject2.setAxisAlignedHitbox(true);
-
-	testingObject2.instantiate(glm::vec3(3.4f, -0.2f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-}
-gameObject testingObject3;
-void setup5(shader& s) {
-	model backpack("assets/scene2/box/box.obj");
-	testingObject3.init(backpack, s, nullptr, nullptr, nullptr);
-	//testingObject3.setAxisAlignedHitbox(true);
-
-	testingObject3.instantiate(glm::vec3(3.4f, -25.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-}
-
 gameObject another;
 void setup2(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
-	another.init(backpack, s, nullptr, nullptr, nullptr);
+	//another.init(backpack, s, nullptr, nullptr, nullptr);
 	//another.setAxisAlignedHitbox(true);
 
-	another.instantiate(glm::vec3(25.0f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -98,9 +73,9 @@ int main() {
 	//just for testing
 	setup(mainShader);
 	setup2(mainShader);
-	setup3(mainShader);
-	setup4(mainShader);
-	setup5(mainShader);
+	//setup3(mainShader);
+	//setup4(mainShader);
+	//setup5(mainShader);
 	
 	skybox normSkybox;
 	normSkybox.init("assets/scene2/skyboxNorm", ".jpg");

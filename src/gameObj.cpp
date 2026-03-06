@@ -120,9 +120,11 @@ void gameObject::collisionState(bool state, unsigned int collideeIndex, instance
 bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex) {
 	
 	for (int i = 0; i < all.size(); i++) {
-		if (all[i]->getObjectID() == this->objectID) continue;
+		//if (all[i]->getObjectID() == this->objectID) continue;
 
 		for (int j = 0; j < all[i]->instances.size(); j++) {
+			if (j == colliderIndex) continue;
+
 			//check for collision: returns true if the coordinates of the two objects have a common area.
 			bool collision = false;
 
@@ -218,6 +220,7 @@ glm::mat4 gameObject::getPosMatrix(const unsigned int index) {
 }
 
 shader gameObject::getRenderShader() { return renderShader; }
+
 model gameObject::getModel() {
 	if (colliderModelDefined) return collider;
 	return objectModel;
@@ -261,3 +264,22 @@ void gameObject::bindInstanceModel() {
 		glBindVertexArray(0);
 	}
 }
+
+void gameObject::translate(const unsigned int instanceIndex, glm::vec3 dir, float mag) {
+	if (instanceIndex < 0 || instanceIndex >= this->instances.size()) {
+		std::cout << std::endl << "ERROR: Specified index for object translation is OUT OF BOUND." << std::endl;
+		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() << std::endl;
+		engine::terminate();
+	}
+	this->instances[instanceIndex].pos += dir * static_cast<float>(mag);
+}
+void gameObject::rotate(const unsigned int instanceIndex, glm::vec3 rotation) {
+	if (instanceIndex < 0 || instanceIndex >= this->instances.size()) {
+		std::cout << std::endl << "ERROR: Specified index for object translation is OUT OF BOUND." << std::endl;
+		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() << std::endl;
+		engine::terminate();
+	}
+	this->instances[instanceIndex].rot = rotation;
+}
+
+bool gameObject::trigger() { return this->isTrigger; }
