@@ -22,6 +22,7 @@
 //#define DISABLE_LIGHTING
 //#define DISABLE_INSTANCING
 //#define LEGACY_COLLISION
+//#define COLLSION_DETECTION_ONLY
 
 extern double deltaTime;
 

@@ -33,8 +33,13 @@ private:
 	bool collidable;
 	bool isTrigger;
 
-	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
+	bool physicsModelEnabled = false;
+	bool physicsAttribLoaded = false;
+	float objectWeight;
 
+
+
+	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
 	std::vector<glm::mat4> getInstanceModel();
 	void bindInstanceModel();
 public:
@@ -63,8 +68,18 @@ public:
 	glm::mat4 getPosMatrix(const unsigned int index);
 	shader getRenderShader();
 
-	//getting the model used for collision of the object
+	//getting the model used for collision of the object 
 	model getModel();
+
+	void translate(const unsigned int instanceIndex, glm::vec3 dir, float mag);
+	void rotate(const unsigned int instanceIndex, glm::vec3 rotation);
+
+	bool trigger();
+
+	void initializePhysicsModel(float weight);
+	bool physicsModelLoadStatus();
+	void setPhysicsModelStatus(bool state);
+	float getWeight();
 };
 
 extern std::vector<gameObject*> allObjects;

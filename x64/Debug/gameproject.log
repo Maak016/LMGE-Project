@@ -1,2 +1,9 @@
-﻿  main.cpp
+﻿  yes.cpp
+  gameObj.cpp
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(23,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(39,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(76,56): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  main.cpp
+  maths.cpp
+  Generating Code...
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

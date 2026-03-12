@@ -218,7 +218,14 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 	return false;
 }
 
-bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {\
+
+float mtvMag;
+glm::vec3 mtvVec;
+glm::vec3 prevVector;
+bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {
+	float minOverlap;
+	glm::vec3 minVector;
+
 	//if the two objects' close proximity trigger (two spheres) do not overlap, the checking is skipped -> better performance
 	float r1 = first->getModel().getCloseProximityRadius();
 	float r2 = second->getModel().getCloseProximityRadius();
@@ -259,7 +266,7 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 		normal2.insert(normal2.end(), faceNormals.begin(), faceNormals.end());
 	}
 
-	//transforming the normal vectors with the normal matrix if the object is not axis-aligned
+	//transforming the normal vectors with the normal matrix if the object's hitbox is not axis-aligned
 	if (!first->axisAlignedHitboxState()) {
 		glm::mat3 normalMatrix1 = glm::mat3(glm::transpose(glm::inverse(model1)));
 		for (glm::vec3& vector : normal1) vector = normalMatrix1 * vector;
@@ -298,6 +305,32 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 
 		//return true if overlap between the two projections is found.
 		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
+
+#ifndef COLLISION_DETECTION_ONLY
+		//Setting the minimum translation vector (MTV)
+		if (projection1[1] >= projection2[0]) {
+			//Sets reference values
+			if (i == 0) {
+				minOverlap = abs(projection1[1] - projection2[0]);
+				minVector = axes[i];
+				continue;
+			}
+
+			//if the current overlap is smaller than the last recorded min, the minimum vector and magnitude is set
+			minVector = abs(projection1[1] - projection2[0]) < minOverlap ? axes[i] : minVector;
+			minOverlap = abs(projection1[1] - projection2[0]) < minOverlap ? abs(projection1[1] - projection2[0]) : minOverlap;
+		}
+		else if (projection2[1] >= projection1[0]) {
+			if (i == 0) {
+				minOverlap = abs(projection2[1] - projection1[0]);
+				minVector = axes[i];
+				continue;
+			}
+
+			minVector = abs(projection2[1] - projection1[0]) < minOverlap ? axes[i] : minVector;
+			minOverlap = abs(projection2[1] - projection1[0]) < minOverlap ? abs(projection2[1] - projection1[0]) : minOverlap;
+		}
+#endif
 	}
 
 	//test failed --> next set of axes: the cross product of each normal vector of one object with each normal vector of the other object
@@ -336,8 +369,48 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 
 		//return true if overlap between the two projections is found.
 		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
+
+#ifndef COLLISION_DETECTION_ONLY
+		//Setting the minimum translation vector (MTV) accordingly
+		if (projection1[1] >= projection2[0]) {
+			//Sets reference values
+			if (i == 0) {
+				minOverlap = abs(projection1[1] - projection2[0]);
+				minVector = axes[i];
+				continue;
+			}
+
+			//if the current overlap is smaller than the last recorded min, the minimum vector and magnitude is set
+			minVector = abs(projection1[1] - projection2[0]) < minOverlap ? axes[i] : minVector;
+			minOverlap = abs(projection1[1] - projection2[0]) < minOverlap ? abs(projection1[1] - projection2[0]) : minOverlap;
+		}
+		else if (projection2[1] >= projection1[0]) {
+			if (i == 0) {
+				minOverlap = abs(projection2[1] - projection1[0]);
+				minVector = axes[i];
+				continue;
+			}
+
+			minVector = abs(projection2[1] - projection1[0]) < minOverlap ? axes[i] : minVector;
+			minOverlap = abs(projection2[1] - projection1[0]) < minOverlap ? abs(projection2[1] - projection1[0]) : minOverlap;
+		}
+#endif
 	}
 
-	//std::cout << "yes";
+#ifndef COLLISION_DETECTION_ONLY
+	if (minVector == -prevVector) mtvVec = prevVector;
+	else mtvVec = minVector;
+	mtvMag = minOverlap;
+
+	prevVector = mtvVec;
+
+	std::cout << mtvMag << ", " << '(' << mtvVec.x << ',' << mtvVec.y << ',' << mtvVec.z << ')' << std::endl;
+
+	if (!first->trigger() && !second->trigger()) {
+		first->translate(firstIndex, mtvVec, mtvMag / 2.0f);
+		second->translate(secIndex, -mtvVec, mtvMag / 2.0f);
+	}
+#endif
+
 	return true;
 }
