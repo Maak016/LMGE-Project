@@ -75,7 +75,14 @@ void gameObject::update() {
 
 	objectModel.drawInstanced(renderShader, instances.size());
 
-	for(int i = 0; i < instances.size(); i++)
+	for (int i = 0; i < instances.size(); i++) {
+		if (physicsModelEnabled && physicsAttribLoaded) {
+			instances[i].currentMovement = glm::normalize(instances[i].pos - instances[i].lastPos);
+			instances[i].lastPos = instances[i].pos;
+
+			instances[i].pos += (instances[i].currentMovement + instances[i].moveVector) * static_cast<float>(deltaTime);
+		}
+
 		if (collidable) {
 			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
 				if (onCollision != nullptr) onCollision();
@@ -86,6 +93,7 @@ void gameObject::update() {
 				if (onCollision != nullptr) onCollision();
 			}
 		}
+	}
 
 #endif
 }
@@ -98,11 +106,11 @@ void gameObject::postFrameCleanup() {
 
 void gameObject::runtimeInit() { if(initFunc != nullptr) initFunc(); }
 
-void gameObject::instantiate(glm::vec3 pos, glm::vec3 rot) { instances.push_back({this->objectID, pos, rot, false, false, {}}); }
+void gameObject::instantiate(glm::vec3 pos, glm::vec3 rot) { instances.push_back({this->objectID, pos, rot, false, false, {}, pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f) }); }
 void gameObject::instantiate(float x, float y, float z, float rotX, float rotY, float rotZ) {
 	glm::vec3 pos = glm::vec3(x, y, z);
 	glm::vec3 rot = glm::vec3(rotX, rotY, rotZ);
-	instances.push_back({this->objectID, pos, rot, false, false, {}});
+	instances.push_back({this->objectID, pos, rot, false, false, {}, pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)});
 }
 
 std::vector<std::vector<glm::vec3>> gameObject::hitbox() { return hitboxRegion; }

@@ -27,6 +27,10 @@ private:
 		bool destroyed = false;
 		bool colliding = false;
 		std::vector<instance*> collidees;
+
+		glm::vec3 lastPos;
+		glm::vec3 moveVector;
+		glm::vec3 currentMovement;
 	};
 	std::vector<glm::mat4> instanceModel;
 
@@ -36,8 +40,6 @@ private:
 	bool physicsModelEnabled = false;
 	bool physicsAttribLoaded = false;
 	float objectWeight;
-
-
 
 	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
 	std::vector<glm::mat4> getInstanceModel();

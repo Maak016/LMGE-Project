@@ -16,29 +16,47 @@ bool released = true;
 
 void engine::terminate() { engineTerminated = true; }
 
+//-----------Code in this part is only for testing the way the engine works--------------
 bool moving = false;
 bool movingRev = false;
 
 gameObject testingObject;
+gameObject another;
 void update() {
 	if (moving) {
-		testingObject.instances[0].pos += glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
-		testingObject.instances[1].pos += glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
+		//testingObject.instances[0].pos += glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
+		//testingObject.instances[1].pos += glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
+		testingObject.instances[0].pos += glm::normalize(another.instances[0].pos - testingObject.instances[0].pos) * 0.005f;
+		another.instances[0].pos += glm::normalize(testingObject.instances[0].pos - another.instances[0].pos) * 0.005f;
 	}
 	else if (movingRev) {
-		testingObject.instances[0].pos -= glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
-		testingObject.instances[1].pos -= glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
+		//testingObject.instances[0].pos -= glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
+		//testingObject.instances[1].pos -= glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
+		testingObject.instances[0].pos -= glm::normalize(another.instances[0].pos - testingObject.instances[0].pos) * 0.005f;
+		another.instances[0].pos -= glm::normalize(testingObject.instances[0].pos - another.instances[0].pos) * 0.005f;
 	}
 }
 void setup(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
 	testingObject.init(backpack, s, nullptr, update, nullptr);
-	testingObject.setAxisAlignedHitbox(true);
+	//testingObject.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(7.4f, -0.4f, 3.7f), glm::vec3(0.0f, 50.0f, 30.0f));
-	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	//testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//testingObject.initializePhysicsModel(20);
 }
+void setup2(shader& s) {
+	model backpack("assets/scene2/box/box.obj");
+	another.init(backpack, s, nullptr, nullptr, nullptr);
+	//testingObject.setAxisAlignedHitbox(true);
 
+	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	//another.initializePhysicsModel(40);
+}
+//----------------------------------------------------------------------------------------
 
 int main() {
 	if (glfwInit() != GLFW_TRUE) std::cout << "ERROR: GLFW initialization failed." << std::endl;
@@ -78,6 +96,7 @@ int main() {
 
 	//just for testing
 	setup(mainShader);
+	setup2(mainShader);
 	
 	skybox normSkybox;
 	normSkybox.init("assets/scene2/skyboxNorm", ".jpg");
@@ -122,7 +141,7 @@ int main() {
 		}
 		else if (!glfwGetKey(mainWindow, GLFW_KEY_F) && !released) released = true;
 
-		inputHandler(mainWindow);
+		movementInputHandler(mainWindow);
 
 		//hide cursor and set the callback for processing input when mouseInput == true
 		if (mouseInput) {

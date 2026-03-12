@@ -5,74 +5,75 @@ glm::vec3 camFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 camUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 camRight;
 const float FOV = 45.0f;
-const float mouseSensitivity = 0.3f;
+const float mouseSensitivity = 0.001f;
 double pitch = 0;
 double yaw = 0;
 
-const double moveSpeedNorm = 0.1;
-const double moveSpeedFast = 1.5 * moveSpeedNorm;
-const float jumpStrength = 10.0f;
-bool jumping = false;
+const double moveSpeedNorm = 10.0f;
+const double moveSpeedFast = 2.0 * moveSpeedNorm;
+const float jumpHeight = 5.0f;
+const float jumpStrength = 5.0f;
+
+bool onGround = false;
+bool jump = false;
 
 constexpr float G = 9.81;
 const float playerWeight = 70;
 
-glm::vec3 moveVector = glm::vec3(0.0f, -1.0f, 0.0f);
-glm::vec3 lastPos = glm::vec3(camPos.x, 0.0f, camPos.z);
-void inputHandler(GLFWwindow* window) {
-	camRight = glm::normalize(glm::cross(camFront, camUp));
-	
-	glm::vec3 currentDir;
+glm::vec3 lastPos = camPos;		//The position of the player in the last frame
+float currentGroundLevel = -1.0f;
 
-	currentDir = lastPos == camPos ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::normalize(camPos - lastPos);
+glm::vec3 inputMoveVector = glm::vec3(0.0f);
+glm::vec3 currentVelocity = glm::vec3(0.0f);
+void movementInputHandler(GLFWwindow* window) {
+	camRight = glm::cross(camFront, camUp);
+	glm::vec3 heading = -glm::cross(camRight, camUp);
 
-#ifdef DEBUGMODE
-	std::cout << std::endl << "--Player movement properties-- \n";
-	std::cout << "current movement direction: " << currentDir.x << ',' << currentDir.y << ',' << currentDir.z << std::endl;
-	std::cout << "camera (player) pos: " << camPos.x << ',' << camPos.y << ',' << camPos.z << std::endl;
-#endif
+	currentVelocity = camPos - lastPos;
+	lastPos = camPos;
 
-	glm::vec3 counterMovement = -currentDir * G * 0.01f;
-	moveVector += counterMovement;
-
-	lastPos = glm::vec3(camPos.x, 0.0f, camPos.z);
-	if (camPos.y > -1.0f) {
-		moveVector += glm::vec3(0.0f, -1.0f, 0.0f) * 0.00001f * G * (float)deltaTime;
-		jumping = true;
-	}
+	//Player-Ground collision detection
+	if (camPos.y > currentGroundLevel) onGround = false;
 	else {
-		moveVector.y = 0.0f;
-		jumping = false;
+		onGround = true;
+		camPos.y = currentGroundLevel;
+		currentVelocity.y = 0;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_W) || glfwGetKey(window, GLFW_KEY_S) || glfwGetKey(window, GLFW_KEY_D) || glfwGetKey(window, GLFW_KEY_A)) {
-		//The forward vector relative to the camera is the cross product of the right and up vector
-		glm::vec3 fwd = glm::normalize(glm::cross(camRight, camUp));
+	//ground movement
+	if (onGround) {
+		glm::vec3 vector = glm::vec3(0.0f);
+		vector += static_cast<float>(glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S)) * heading;
+		vector += static_cast<float>(glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A)) * camRight;
 
-		glm::vec3 groundMovement = glm::vec3(0.0f, 0.0f, 0.0f);
-
-		int movement = glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S);
-		groundMovement -= fwd * static_cast<float>(movement);
-
-		int movementLat = glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A);
-		groundMovement += camRight * static_cast<float>(movementLat);
-
-		groundMovement = glm::normalize(groundMovement);
-
-		moveVector += groundMovement * static_cast<float>(moveSpeedNorm * deltaTime);
-	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) && !jumping) {
-		moveVector += camUp * static_cast<float>(jumpStrength * deltaTime * 10);
+		if (glm::length(vector) > 0.0f) inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) ? moveSpeedFast : moveSpeedNorm));
 	}
 
-	camPos += moveVector;
+	//ground counter movement
+	if (onGround) {
+		inputMoveVector.x -= currentVelocity.x * playerWeight * G * deltaTime * 5.0f;
+		inputMoveVector.z -= currentVelocity.z * playerWeight * G * deltaTime * 5.0f;
+	}
+
+	//jumping
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && onGround) jump = true;
+
+	if (jump && camPos.y < jumpHeight) currentVelocity.y += jumpStrength * 10.0f;
+	else jump = false;
+
+	//Gravity handling
+	if(!onGround) currentVelocity.y -= G * playerWeight * deltaTime * 15.0f;
+
+	currentVelocity += inputMoveVector;
+	camPos += currentVelocity * (float)deltaTime;
 }
-glm::vec3 getMovementVector() { return moveVector; }
+
+glm::vec3 getMovementVector() { return currentVelocity; }
 void addForce(glm::vec3 direction, float magnitude) {
 	direction = glm::normalize(direction);
 	direction *= magnitude * static_cast<float>(deltaTime);
 
-	moveVector += direction;
+	currentVelocity += direction;
 }
 
 double lastX = scrWidth / 2;
@@ -92,8 +93,8 @@ void mouseMovementCallback(GLFWwindow* window, double xPos, double yPos) {
 	lastX = xPos;
 	lastY = yPos;
 
-	offsetX *= mouseSensitivity * deltaTime;
-	offsetY *= mouseSensitivity * deltaTime;
+	offsetX *= mouseSensitivity;
+	offsetY *= mouseSensitivity;
 
 	yaw -= offsetX;
 	pitch -= offsetY;
