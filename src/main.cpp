@@ -33,9 +33,9 @@ void update() {
 void setup(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
 	testingObject.init(backpack, s, nullptr, update, nullptr);
-	//testingObject.setAxisAlignedHitbox(true);
+	testingObject.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(7.4f, -0.4f, 3.7f), glm::vec3(0.0f, 50.0f, 30.0f));
 	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
