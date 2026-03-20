@@ -50,6 +50,8 @@ void gameObject::update() {
 
 #ifdef DISABLE_INSTANCING
 	for (int i = 0; i < instances.size(); i++) {
+		if (instances[i].destroyed) continue;
+
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 
 		modelMatrix = glm::translate(modelMatrix, instances[i].pos);		//translates the object with the i(th) vector
@@ -76,12 +78,7 @@ void gameObject::update() {
 	objectModel.drawInstanced(renderShader, instances.size());
 
 	for (int i = 0; i < instances.size(); i++) {
-		if (physicsModelEnabled && physicsAttribLoaded) {
-			instances[i].currentMovement = glm::normalize(instances[i].pos - instances[i].lastPos);
-			instances[i].lastPos = instances[i].pos;
-
-			instances[i].pos += (instances[i].currentMovement + instances[i].moveVector) * static_cast<float>(deltaTime);
-		}
+		if (instances[i].destroyed) continue;
 
 		if (collidable) {
 			if (collision(allObjects, instances[i].collidees, i) || instances[i].colliding) {
@@ -93,6 +90,8 @@ void gameObject::update() {
 				if (onCollision != nullptr) onCollision();
 			}
 		}
+
+		if (physicsModelEnabled && physicsAttribLoaded) simObjectPhysics(i);
 	}
 
 #endif
@@ -237,6 +236,7 @@ model gameObject::getModel() {
 std::vector<glm::mat4> gameObject::getInstanceModel() {
 	std::vector<glm::mat4> result;
 	for (int i = 0; i < instances.size(); i++) {
+		if (instances[i].destroyed) continue;
 		result.push_back(getPosMatrix(i));
 	}
 
@@ -292,15 +292,77 @@ void gameObject::rotate(const unsigned int instanceIndex, glm::vec3 rotation) {
 
 bool gameObject::trigger() { return this->isTrigger; }
 
-void gameObject::initializePhysicsModel(float weight) {
+
+
+void gameObject::freeInstanceMemory(const unsigned int instanceIndex) {
+	if (instanceIndex >= this->instances.size()) {
+		std::cout << "ERROR: instance index specified in freeInstanceMemory() is OUT OF BOUND." << std::endl;
+		engine::terminate();
+	}
+
+	//moves the instance to the end of the array
+	for (int i = instanceIndex; i < this->instances.size() - 1; i++) {
+		instance& temp = instances.at(i + 1);
+		instances.at(i + 1) = instances.at(i);
+		instances.at(i) = temp;
+	}
+
+	instances.pop_back();	//delete the instance, having moved it to the end of the array
+}
+void gameObject::destroyInstance(const unsigned int instanceIndex) { this->instances[instanceIndex].destroyed = true; }
+
+void gameObject::initializePhysicsModel(float weight, float softness) {
 	this->objectWeight = weight;
-	physicsAttribLoaded = true;
-	physicsModelEnabled = true;
+	this->softness = softness;
+
+	this->physicsAttribLoaded = true;
+	this->physicsModelEnabled = true;
 }
-bool gameObject::physicsModelLoadStatus() { return this->physicsModelEnabled; }
 void gameObject::setPhysicsModelStatus(bool state) {
-	if (!physicsModelEnabled)
-		std::cout << "WARNING: Physics model data not loaded prior for object with ID " << this->objectID << ". Please call to initializePhysicsModel() first." << std::endl;
-	this->physicsModelEnabled = state;
+	if (state && !physicsAttribLoaded) {
+		std::cout << "ERROR: Object's physics attributes not loaded. Please use gameObject::initializePhysicsModel() first." << std::endl;
+		engine::terminate();
+		return;
+	}
+	physicsModelEnabled = state;
 }
+
+bool gameObject::physicsModelLoadStatus() { return this->physicsAttribLoaded; }
 float gameObject::getWeight() { return this->objectWeight; }
+float gameObject::getSoftness() { return this->softness; }
+
+float gameObject::getSpeed(const unsigned int instanceIndex) {
+	return glm::length(instances[instanceIndex].currentVelocity) / deltaTime;
+}
+float gameObject::getSpeed(const unsigned int instanceIndex, glm::vec3 dir) {
+	if (glm::length(instances[instanceIndex].currentVelocity) == 0.0f) return 0.0f;
+
+	glm::vec3 v = glm::normalize(instances[instanceIndex].currentVelocity);
+	glm::vec3 direction = glm::normalize(dir);
+
+	float cosTheta = glm::dot(v, direction) / (glm::length(v) * glm::length(direction));
+
+	return (glm::length(instances[instanceIndex].currentVelocity) * cosTheta / deltaTime);
+}
+
+void gameObject::addForce(const unsigned int instanceIndex, glm::vec3 dir, float mag) {
+	if (!this->physicsModelEnabled || !this->physicsAttribLoaded)
+		std::cout << "WARNING: Object's physics model is not enabled or does not have initialized data. Input force will NOT have any effect." << std::endl;
+	
+	this->instances[instanceIndex].inputMoveVector += (dir * mag * 0.05f) / (this->objectWeight * 0.5f);
+}
+
+void gameObject::simObjectPhysics(const unsigned int instanceIndex) {
+	instance* currentInstance = &this->instances[instanceIndex];
+
+	//calculate current moving velocity & speed
+	currentInstance->currentVelocity = currentInstance->pos - currentInstance->lastPos;
+	currentInstance->lastPos = currentInstance->pos;
+
+	//simulate gravity
+#ifndef DISABLE_GRAVITY
+	currentInstance->currentVelocity.y -= physicsConstants::G * this->objectWeight * deltaTime * 15.0f;
+#endif
+
+	currentInstance->pos += (currentInstance->currentVelocity + currentInstance->inputMoveVector) * static_cast<float>(deltaTime);
+}

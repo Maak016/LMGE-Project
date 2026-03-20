@@ -1,18 +1,13 @@
-﻿  inputSystem.cpp
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(20,19): warning C4305: 'initializing': truncation from 'double' to 'const float'
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         with
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         [
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:             T=float
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         ]
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         with
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         [
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:             T=float
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         ]
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         with
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         [
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:             T=float
-D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         ]
+﻿  main.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(34,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/main.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\main.cpp(48,43): warning C4305: 'argument': truncation from 'double' to 'float'
+D:\Visual Studio projects\gameproject\gameproject\src\main.cpp(59,37): warning C4305: 'argument': truncation from 'double' to 'float'
+  maths.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(34,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/maths.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\maths.cpp(374,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

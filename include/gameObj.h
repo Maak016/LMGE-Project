@@ -29,8 +29,8 @@ private:
 		std::vector<instance*> collidees;
 
 		glm::vec3 lastPos;
-		glm::vec3 moveVector;
-		glm::vec3 currentMovement;
+		glm::vec3 currentVelocity;
+		glm::vec3 inputMoveVector;
 	};
 	std::vector<glm::mat4> instanceModel;
 
@@ -39,9 +39,12 @@ private:
 
 	bool physicsModelEnabled = false;
 	bool physicsAttribLoaded = false;
+
 	float objectWeight;
+	float softness;
 
 	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
+	void simObjectPhysics(const unsigned int instanceIndex);
 	std::vector<glm::mat4> getInstanceModel();
 	void bindInstanceModel();
 public:
@@ -78,10 +81,19 @@ public:
 
 	bool trigger();
 
-	void initializePhysicsModel(float weight);
+	void initializePhysicsModel(float weight, float softness);
 	bool physicsModelLoadStatus();
 	void setPhysicsModelStatus(bool state);
 	float getWeight();
+	float getSoftness();
+	
+	float getSpeed(const unsigned int instanceIndex);
+	float getSpeed(const unsigned int instanceIndex, glm::vec3 dir);
+
+	void destroyInstance(const unsigned int instanceIndex);
+	void freeInstanceMemory(const unsigned int instanceIndex);
+
+	void addForce(const unsigned int instanceIndex, glm::vec3 dir, float mag);
 };
 
 extern std::vector<gameObject*> allObjects;

@@ -23,9 +23,13 @@
 //#define DISABLE_INSTANCING
 //#define LEGACY_COLLISION
 //#define COLLSION_DETECTION_ONLY
+#define DISABLE_GRAVITY
 
 extern double deltaTime;
 
 namespace engine {
 	void terminate();
+}
+namespace physicsConstants {
+	const float G = 9.81;
 }

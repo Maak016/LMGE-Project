@@ -23,17 +23,18 @@ bool movingRev = false;
 gameObject testingObject;
 gameObject another;
 void update() {
+	if (moving && movingRev) {
+		testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+		another.instantiate(glm::vec3(6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	}
+
 	if (moving) {
-		//testingObject.instances[0].pos += glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
-		//testingObject.instances[1].pos += glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
-		testingObject.instances[0].pos += glm::normalize(another.instances[0].pos - testingObject.instances[0].pos) * 0.005f;
-		another.instances[0].pos += glm::normalize(testingObject.instances[0].pos - another.instances[0].pos) * 0.005f;
+		testingObject.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
+		another.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
 	}
 	else if (movingRev) {
-		//testingObject.instances[0].pos -= glm::normalize(testingObject.instances[1].pos - testingObject.instances[0].pos) * 0.005f;
-		//testingObject.instances[1].pos -= glm::normalize(testingObject.instances[0].pos - testingObject.instances[1].pos) * 0.005f;
-		testingObject.instances[0].pos -= glm::normalize(another.instances[0].pos - testingObject.instances[0].pos) * 0.005f;
-		another.instances[0].pos -= glm::normalize(testingObject.instances[0].pos - another.instances[0].pos) * 0.005f;
+		testingObject.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
+		another.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
 	}
 }
 void setup(shader& s) {
@@ -41,10 +42,10 @@ void setup(shader& s) {
 	testingObject.init(backpack, s, nullptr, update, nullptr);
 	//testingObject.setAxisAlignedHitbox(true);
 
-	testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	//testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	//testingObject.initializePhysicsModel(20);
+	testingObject.initializePhysicsModel(25, 0.2);
 }
 void setup2(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
@@ -52,9 +53,10 @@ void setup2(shader& s) {
 	//testingObject.setAxisAlignedHitbox(true);
 
 	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	another.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(-6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	//another.initializePhysicsModel(40);
+	another.initializePhysicsModel(20, 0.1);
 }
 //----------------------------------------------------------------------------------------
 

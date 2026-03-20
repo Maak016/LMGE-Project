@@ -219,12 +219,18 @@ bool pointInPolygon(glm::vec3 point, glm::mat4 colliderModelMatrix, std::vector<
 }
 
 
-float mtvMag;
-glm::vec3 mtvVec;
-glm::vec3 prevVector;
+/*Separating Axis Theorem test
+this is a streamlined and more versatile method of checking for collision, including these steps;
+- projecting the two objects onto a set of axes consisting of face normals and the cross product of each pair of face normals between the two objects
+- if there is any axis on which there is no overlap, return false
+- then, if the two objects are not triggers, gravity simulation will cause them to "bounce"
+*/
+float mtvMag = 0.0f;
+glm::vec3 mtvVec = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 prevVector = glm::vec3(0.0f, 0.0f, 0.0f);
 bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firstIndex, unsigned int secIndex) {
-	float minOverlap;
-	glm::vec3 minVector;
+	float minOverlap = 0.0f;
+	glm::vec3 minVector = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	//if the two objects' close proximity trigger (two spheres) do not overlap, the checking is skipped -> better performance
 	float r1 = first->getModel().getCloseProximityRadius();
@@ -279,64 +285,7 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 	axes = normal1;
 	axes.insert(axes.end(), normal2.begin(), normal2.end());
 
-	//project the two polyhedra onto each of the previously found axes by getting the minimum and maximum dot product of axes with a vertices
-	for (int i = 0; i < axes.size(); i++) {
-		//projection value arrays defined in this format: {minDot, maxDot}
-		float defaultVal1 = glm::dot(glm::vec3(model1 * glm::vec4(firstVertices[0].coords, 1.0f)), axes[i]);
-		float defaultVal2 = glm::dot(glm::vec3(model2 * glm::vec4(secVertices[0].coords, 1.0f)), axes[i]);
-
-		float projection1[2] = { defaultVal1, defaultVal1 };
-		float projection2[2] = { defaultVal2, defaultVal2 };
-
-		for (Vertex& v : firstVertices) {
-			glm::vec3 pos = glm::vec3(model1 * glm::vec4(v.coords, 1.0f));
-
-			float dotProduct = glm::dot(pos, axes[i]);
-			if (dotProduct < projection1[0]) projection1[0] = dotProduct;
-			else if (dotProduct > projection1[1]) projection1[1] = dotProduct;
-		}
-		for (Vertex& v : secVertices) {
-			glm::vec3 pos = glm::vec3(model2 * glm::vec4(v.coords, 1.0f));
-
-			float dotProduct = glm::dot(pos, axes[i]);
-			if (dotProduct < projection2[0]) projection2[0] = dotProduct;
-			else if (dotProduct > projection2[1]) projection2[1] = dotProduct;
-		}
-
-		//return true if overlap between the two projections is found.
-		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
-
-#ifndef COLLISION_DETECTION_ONLY
-		//Setting the minimum translation vector (MTV)
-		if (projection1[1] >= projection2[0]) {
-			//Sets reference values
-			if (i == 0) {
-				minOverlap = abs(projection1[1] - projection2[0]);
-				minVector = axes[i];
-				continue;
-			}
-
-			//if the current overlap is smaller than the last recorded min, the minimum vector and magnitude is set
-			minVector = abs(projection1[1] - projection2[0]) < minOverlap ? axes[i] : minVector;
-			minOverlap = abs(projection1[1] - projection2[0]) < minOverlap ? abs(projection1[1] - projection2[0]) : minOverlap;
-		}
-		else if (projection2[1] >= projection1[0]) {
-			if (i == 0) {
-				minOverlap = abs(projection2[1] - projection1[0]);
-				minVector = axes[i];
-				continue;
-			}
-
-			minVector = abs(projection2[1] - projection1[0]) < minOverlap ? axes[i] : minVector;
-			minOverlap = abs(projection2[1] - projection1[0]) < minOverlap ? abs(projection2[1] - projection1[0]) : minOverlap;
-		}
-#endif
-	}
-
-	//test failed --> next set of axes: the cross product of each normal vector of one object with each normal vector of the other object
-	axes.clear();	//clear the previous set of axes for a new set
-
-	//getting the axes
+	//getting the axes of cross products
 	for (int i = 0; i < normal1.size(); i++) {
 		for (int j = 0; j < normal2.size(); j++) {
 			axes.push_back(glm::normalize(glm::cross(normal1[i], normal2[j])));
@@ -371,7 +320,7 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 		if (projection1[1] < projection2[0] || projection2[1] < projection1[0]) return false;
 
 #ifndef COLLISION_DETECTION_ONLY
-		//Setting the minimum translation vector (MTV) accordingly
+		//Setting the minimum translation vector (MTV). projection1 max - projection2 min can be different from projection2 max - projection1 min -> if statement needed
 		if (projection1[1] >= projection2[0]) {
 			//Sets reference values
 			if (i == 0) {
@@ -397,6 +346,8 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 #endif
 	}
 
+	axes.clear();
+
 #ifndef COLLISION_DETECTION_ONLY
 	if (minVector == -prevVector) mtvVec = prevVector;
 	else mtvVec = minVector;
@@ -404,11 +355,26 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 
 	prevVector = mtvVec;
 
-	std::cout << mtvMag << ", " << '(' << mtvVec.x << ',' << mtvVec.y << ',' << mtvVec.z << ')' << std::endl;
+	//std::cout << mtvMag << ", " << '(' << mtvVec.x << ',' << mtvVec.y << ',' << mtvVec.z << ')' << std::endl;
 
 	if (!first->trigger() && !second->trigger()) {
-		first->translate(firstIndex, mtvVec, mtvMag / 2.0f);
-		second->translate(secIndex, -mtvVec, mtvMag / 2.0f);
+		first->translate(firstIndex, mtvVec, mtvMag / 2.0f + 0.01f);
+		second->translate(secIndex, -mtvVec, mtvMag / 2.0f + 0.01f);
+
+		//calculate the force of the impact (using work-kinetic energy theorem) and add it to both of the objects, making them "bounce"
+		glm::vec3 firstPos = first->instances[firstIndex].pos;
+		glm::vec3 secPos = second->instances[secIndex].pos;
+
+		float d = first->getSoftness() + second->getSoftness();
+		d = d == 0.0f ? 0.001f : d;
+
+		float v = first->getSpeed(firstIndex, secPos - firstPos) + second->getSpeed(secIndex, firstPos - secPos); //gets the speed at which the two instances are moving towards each other
+		float avgWeight = (first->getWeight() + second->getWeight()) / 2.0f;
+
+		float forceMag = (avgWeight * pow(v, 2)) / (2 * d);
+
+		first->addForce(firstIndex, glm::normalize(mtvVec), forceMag * 0.4f);
+		second->addForce(secIndex, glm::normalize(-mtvVec), forceMag * 0.4f);
 	}
 #endif
 
