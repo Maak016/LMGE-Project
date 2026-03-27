@@ -191,10 +191,15 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 			//move on to the next iteration if no collision between the two instances detected
 			if (!collision) continue;
 			outputObj.push_back(&all[i]->instances[j]);
+
+			std::cout << "LOG: Object with ID " << this->objectID << " colliding with: " << all[i]->getObjectID() << " index " << j << std::endl;
 		}
 	}
 
-	if (outputObj.size() > 0) return true;
+	if (outputObj.size() > 0) {
+		std::cout << std::endl;
+		return true;
+	}
 	return false;
 }
 
@@ -276,16 +281,35 @@ void gameObject::bindInstanceModel() {
 void gameObject::translate(const unsigned int instanceIndex, glm::vec3 dir, float mag) {
 	if (instanceIndex < 0 || instanceIndex >= this->instances.size()) {
 		std::cout << std::endl << "ERROR: Specified index for object translation is OUT OF BOUND." << std::endl;
-		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() << std::endl;
+		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() - 1 << std::endl;
 		engine::terminate();
+
+		return;
 	}
 	this->instances[instanceIndex].pos += dir * static_cast<float>(mag);
+}
+void gameObject::translateRotation(const unsigned int instanceIndex, glm::vec3 axis, float mag) {
+	if (instanceIndex < 0 || instanceIndex >= this->instances.size()) {
+		std::cout << std::endl << "ERROR: Specified index for object rotation is OUT OF BOUND." << std::endl;
+		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() - 1 << std::endl;
+		engine::terminate();
+
+		return;
+	}
+
+	this->instances[instanceIndex].rot += axis * static_cast<float>(mag);
+
+	if (this->instances[instanceIndex].rot.x >= 360.0f) this->instances[instanceIndex].rot.x -= 360 * floor(this->instances[instanceIndex].rot.x / 360.0f);
+	if (this->instances[instanceIndex].rot.y >= 360.0f) this->instances[instanceIndex].rot.y -= 360 * floor(this->instances[instanceIndex].rot.y / 360.0f);
+	if (this->instances[instanceIndex].rot.z >= 360.0f) this->instances[instanceIndex].rot.z -= 360 * floor(this->instances[instanceIndex].rot.z / 360.0f);
 }
 void gameObject::rotate(const unsigned int instanceIndex, glm::vec3 rotation) {
 	if (instanceIndex < 0 || instanceIndex >= this->instances.size()) {
 		std::cout << std::endl << "ERROR: Specified index for object translation is OUT OF BOUND." << std::endl;
 		std::cout << "INFO: Specified Index: " << instanceIndex << '\n' << "; Maximum index: " << this->instances.size() << std::endl;
 		engine::terminate();
+
+		return;
 	}
 	this->instances[instanceIndex].rot = rotation;
 }
@@ -310,6 +334,7 @@ void gameObject::freeInstanceMemory(const unsigned int instanceIndex) {
 	instances.pop_back();	//delete the instance, having moved it to the end of the array
 }
 void gameObject::destroyInstance(const unsigned int instanceIndex) { this->instances[instanceIndex].destroyed = true; }
+void gameObject::reinstate(const unsigned int instanceIndex) { this->instances[instanceIndex].destroyed = false; }
 
 void gameObject::initializePhysicsModel(float weight, float softness) {
 	this->objectWeight = weight;

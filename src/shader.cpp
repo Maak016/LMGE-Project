@@ -66,6 +66,8 @@ void lightSource::bind(shader& currentShader, glm::vec3 camPos) {
 
 	currentShader.uniform(float3, name + ".color", { color.x, color.y, color.z });
 	currentShader.uniform(float1, name + ".ambient", { ambientStrength });
+
+	currentShader.uniform(float3, "camPos", { camPos.x, camPos.y, camPos.z });
 }
 
 void lightSource::postFrameCleanup() {

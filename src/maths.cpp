@@ -366,7 +366,7 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 		glm::vec3 secPos = second->instances[secIndex].pos;
 
 		float d = first->getSoftness() + second->getSoftness();
-		d = d == 0.0f ? 0.001f : d;
+		d = d == 0.0f ? 0.01f : d;
 
 		float v = first->getSpeed(firstIndex, secPos - firstPos) + second->getSpeed(secIndex, firstPos - secPos); //gets the speed at which the two instances are moving towards each other
 		float avgWeight = (first->getWeight() + second->getWeight()) / 2.0f;
@@ -378,5 +378,5 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 	}
 #endif
 
-	return true;
+	return true;	//eventually returning true because no separation was found on any axis
 }

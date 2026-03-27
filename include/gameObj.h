@@ -77,6 +77,7 @@ public:
 	model getModel();
 
 	void translate(const unsigned int instanceIndex, glm::vec3 dir, float mag);
+	void translateRotation(const unsigned int instanceIndex, glm::vec3 axis, float mag);
 	void rotate(const unsigned int instanceIndex, glm::vec3 rotation);
 
 	bool trigger();
@@ -91,9 +92,11 @@ public:
 	float getSpeed(const unsigned int instanceIndex, glm::vec3 dir);
 
 	void destroyInstance(const unsigned int instanceIndex);
+	void reinstate(const unsigned int instanceIndex);
 	void freeInstanceMemory(const unsigned int instanceIndex);
 
 	void addForce(const unsigned int instanceIndex, glm::vec3 dir, float mag);
 };
 
+extern gameObject player;
 extern std::vector<gameObject*> allObjects;

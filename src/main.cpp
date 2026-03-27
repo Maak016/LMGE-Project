@@ -22,20 +22,20 @@ bool movingRev = false;
 
 gameObject testingObject;
 gameObject another;
-void update() {
-	if (moving && movingRev) {
-		testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-		another.instantiate(glm::vec3(6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
-	}
+gameObject yetAnother;
 
+glm::vec3 initialPos = camPos;
+void update() {
 	if (moving) {
 		testingObject.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-		another.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
+		//another.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
 	}
 	else if (movingRev) {
 		testingObject.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-		another.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
+		//another.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
 	}
+
+	//testingObject.instances[1].pos = glm::vec3(initialPos.x, -0.9f, initialPos.z);
 }
 void setup(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
@@ -45,7 +45,9 @@ void setup(shader& s) {
 	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
 	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	testingObject.initializePhysicsModel(25, 0.2);
+	//testingObject.instantiate(initialPos, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	testingObject.initializePhysicsModel(25, 0.5);
 }
 void setup2(shader& s) {
 	model backpack("assets/scene2/box/box.obj");
@@ -53,12 +55,22 @@ void setup2(shader& s) {
 	//testingObject.setAxisAlignedHitbox(true);
 
 	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	another.instantiate(glm::vec3(6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	another.instantiate(glm::vec3(6.4f, -4.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 	another.instantiate(glm::vec3(-6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	another.initializePhysicsModel(20, 0.1);
+	another.initializePhysicsModel(20, 0.5);
 }
 //----------------------------------------------------------------------------------------
+
+gameObject player;
+void playerModelUpdate() { player.instances[0].pos = camPos; }
+void setupPlayerCollision(shader& renderShader) {
+	model hoomanYes("assets/defaultAssets/playerModel/model.obj");
+	player.init(hoomanYes, renderShader, nullptr, playerModelUpdate, nullptr);
+	player.initializePhysicsModel(70.0f, 1.0f);
+
+	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
+}
 
 int main() {
 	if (glfwInit() != GLFW_TRUE) std::cout << "ERROR: GLFW initialization failed." << std::endl;
@@ -97,6 +109,8 @@ int main() {
 #endif
 
 	//just for testing
+	setupPlayerCollision(mainShader);
+
 	setup(mainShader);
 	setup2(mainShader);
 	
