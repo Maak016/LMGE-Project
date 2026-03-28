@@ -43,7 +43,7 @@ void setup(shader& s) {
 	//testingObject.setAxisAlignedHitbox(true);
 
 	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	testingObject.instantiate(glm::vec3(3.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	testingObject.instantiate(glm::vec3(3.4f, -0.9f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	//testingObject.instantiate(initialPos, glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -108,9 +108,9 @@ int main() {
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
 #endif
 
-	//just for testing
 	setupPlayerCollision(mainShader);
 
+	//just for testing
 	setup(mainShader);
 	setup2(mainShader);
 	

@@ -1,10 +1,5 @@
 #include "fundamental.h"
-
 #include "maths.h"
-
-/* TO DO LIST WITH THIS FILE
-*  - 05/02/2025: Fix Memory leak caused by undeleted pointers (dev was too lazy to fix on 5/2/2025 lmao)
-*/
 
 glm::vec2 solveEquation(float a, float b, float c) {
 	if (a == 0) return glm::vec2(0.0f, 0.0f);
@@ -32,12 +27,10 @@ glm::vec2 simulEquation(float x1, float y1, float x2, float y2) {
 linearEquation* linearEqFromSegment(segment* s) {
 	glm::vec2 ab = simulEquation(s->a.x, s->a.y, s->b.x, s->b.y);
 
-#ifdef DEBUGMODE
+#ifdef DEBUG_COLLISION
 	std::cout << "linear eq generation from segment: ";
 	std::cout << "segment: (" << s->a.x << ',' << s->a.y << ',' << s->a.z << "), (" << s->b.x << ',' << s->b.y << ',' << s->b.z << ')' << std::endl;
 #endif // DEBUGMODE
-
-	
 
 	linearEquation* result = new linearEquation;
 

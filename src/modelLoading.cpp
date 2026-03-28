@@ -546,7 +546,7 @@ void skybox::makeActive() { activeSkybox = this; }
 void skybox::makeActive(const unsigned int skyboxID) { activeSkybox = savedSkyboxes.at(skyboxID - 1); }
 
 void skybox::update(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) {
-#ifdef DEBUGMODE
+#ifdef DEBUG_RENDERING
 	std::cout << "--skybox properties--\n" << "Number of loaded skyboxes: " << savedSkyboxes.size()
 		<< "\nActive skybox ID: " << activeSkybox->getID() << std::endl;
 #endif

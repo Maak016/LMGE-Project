@@ -192,14 +192,13 @@ bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>
 			if (!collision) continue;
 			outputObj.push_back(&all[i]->instances[j]);
 
+#ifdef DEBUG_WORLD_PHYSICS
 			std::cout << "LOG: Object with ID " << this->objectID << " colliding with: " << all[i]->getObjectID() << " index " << j << std::endl;
+#endif
 		}
 	}
 
-	if (outputObj.size() > 0) {
-		std::cout << std::endl;
-		return true;
-	}
+	if (outputObj.size() > 0) return true;
 	return false;
 }
 

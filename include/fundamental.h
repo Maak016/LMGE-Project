@@ -18,7 +18,10 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-//#define DEBUGMODE
+//#define DEBUG_WORLD_PHYSICS
+//#define DEBUG_PLAYER_PHYSICS
+//#define DEBUG_RENDERING
+
 //#define DISABLE_LIGHTING
 //#define DISABLE_INSTANCING
 //#define LEGACY_COLLISION

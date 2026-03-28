@@ -1,5 +1,6 @@
-﻿  main.cpp
-D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(34,18): warning C4305: 'initializing': truncation from 'double' to 'float'
-  (compiling source file 'src/main.cpp')
+﻿  maths.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/maths.cpp')
   
+D:\Visual Studio projects\gameproject\gameproject\src\maths.cpp(367,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

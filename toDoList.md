@@ -1,6 +1,5 @@
 <h2>
--Allow for rendering simple objects (eg. cube) (better for debugging)<br>
--fix potential memory leak in gameObject handling<br>
--Implementing finding Minimum Translation Vectors (MTV) for realistic hard collision<br>
--complete lighting logic (half complete)<br>
+-Torque for object translation<br>
+-Ray shooting<br>
+-Input processing system allowing for new press checks and other actions<br>
 </h2>

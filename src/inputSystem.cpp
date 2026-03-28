@@ -66,6 +66,15 @@ void movementInputHandler(GLFWwindow* window) {
 
 	currentVelocity += inputMoveVector;
 	camPos += currentVelocity * (float)deltaTime;
+
+#ifdef DEBUG_PLAYER_PHYSICS
+	std::cout << "-------Player physics properties-------\n";
+	std::cout << "LOG: Current player position: " << '(' << camPos.x << ',' << camPos.y << ',' << camPos.z << ')' << '\n';
+	std::cout << "LOG: Current player move velocity: " << '(' << currentVelocity.x << ',' << currentVelocity.y << ',' << currentVelocity.z << ')' << '\n';
+	std::cout << "LOG: Player jumping/in air status: " << !onGround << '\n';
+
+	std::cout << std::endl;
+#endif
 }
 
 glm::vec3 getMovementVector() { return currentVelocity; }
