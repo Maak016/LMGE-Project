@@ -175,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\scene1\backpack\source_attribution.txt" />
+    <Text Include="devLog.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

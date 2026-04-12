@@ -1,6 +1,21 @@
-﻿  maths.cpp
-D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
-  (compiling source file 'src/maths.cpp')
+﻿  inputSystem.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(40,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/inputSystem.cpp')
   
-D:\Visual Studio projects\gameproject\gameproject\src\maths.cpp(367,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(20,19): warning C4305: 'initializing': truncation from 'double' to 'const float'
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(96,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(96,73): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(96,73): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(96,73): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(96,73): warning C4244:         ]
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(97,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(97,73): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(97,73): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(97,73): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(97,73): warning C4244:         ]
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(107,67): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(107,67): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(107,67): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(107,67): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(107,67): warning C4244:         ]
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

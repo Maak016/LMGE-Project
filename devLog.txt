@@ -1,0 +1,16 @@
+[6/4/26] 
+Input detection system: STILL INCOMPLETE
+- New press registration does not work
+
+[8/4/26] 
+Input detection system: IMPROVEMENT SEEN
+- New press recognition works
+- Default input system still not adapted to new system
+
+Rendering Pre-processor directive changes: MINOR CHANGES
+- Option to use both #DISABLE_INSTANCING and #DISABLE_LIGHTING at the same time
+
+[12/4/26]
+Input detection system: STABLE
+- Adapted default input functionalities to the new system
+- Added error proofing for non-existent key codes

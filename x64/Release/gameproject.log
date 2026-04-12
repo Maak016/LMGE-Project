@@ -1,15 +1,67 @@
-﻿  modelLoading.cpp
+﻿  yes.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'assets/scene1/yes.cpp')
+  
+  gameObj.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/gameObj.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(23,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(39,34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(78,56): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(359,63): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\gameObj.cpp(369,9): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  inputSystem.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/inputSystem.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(20,19): warning C4305: 'initializing': truncation from 'double' to 'const float'
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(54,73): warning C4244:         ]
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(55,73): warning C4244:         ]
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244: '-=': conversion from 'double' to 'T', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         with
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         [
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:             T=float
+D:\Visual Studio projects\gameproject\gameproject\src\inputSystem.cpp(65,66): warning C4244:         ]
+  main.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/main.cpp')
+  
+  maths.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/maths.cpp')
+  
+D:\Visual Studio projects\gameproject\gameproject\src\maths.cpp(367,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  modelLoading.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/modelLoading.cpp')
+  
 D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(64,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(125,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(155,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(159,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(167,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(181,20): warning C4018: '<': signed/unsigned mismatch
-D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(184,21): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(92,52): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(184,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(214,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(218,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(226,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(240,20): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(243,21): warning C4018: '<': signed/unsigned mismatch
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(401,37): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+D:\Visual Studio projects\gameproject\gameproject\src\modelLoading.cpp(504,37): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  shader.cpp
+D:\Visual Studio projects\gameproject\gameproject\include\fundamental.h(37,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+  (compiling source file 'src/shader.cpp')
+  
+  glad.c
 LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  2 of 1459 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB was built with incompatible compiler, fall back to full compilation.
+  All 1538 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Release\gameproject.exe

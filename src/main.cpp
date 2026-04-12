@@ -12,7 +12,6 @@ const int scrWidth = 1280;
 const int scrHeight = 720;
 
 bool mouseInput = false;
-bool released = true;
 
 void engine::terminate() { engineTerminated = true; }
 
@@ -85,6 +84,7 @@ int main() {
 	GLFWwindow* mainWindow = glfwCreateWindow(scrWidth, scrHeight, "yes", nullptr, nullptr);
 	glfwMakeContextCurrent(mainWindow);
 
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "ERROR: OpenGL Loader failed." << std::endl;
 		glfwTerminate();
@@ -101,11 +101,20 @@ int main() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 #ifdef DISABLE_LIGHTING
-	shader mainShader("shaders/main.lmv", "shaders/noLighting.lmf");
-#elif defined(DISABLE_INSTANCING)
+#ifdef DISABLE_INSTANCING
 	shader mainShader("shaders/noInstancing.lmv", "shaders/main.lmf");
 #else
+	shader mainShader("shaders/noInstancing.lmv", "shaders/noLighting.lmf");
+#endif
+
+#else
+
+#ifdef DISABLE_INSTANCING
+	shader mainShader("shaders/main.lmv", "shaders/noLighting.lmf");
+#else
 	shader mainShader("shaders/main.lmv", "shaders/main.lmf");
+#endif
+
 #endif
 
 	setupPlayerCollision(mainShader);
@@ -132,6 +141,10 @@ int main() {
 	glfwSetTime(0);
 
 	glEnable(GL_DEPTH_TEST);
+
+#ifndef LEGACY_INPUT_SYSTEM
+	input::init(mainWindow);
+#endif
 	while (!glfwWindowShouldClose(mainWindow)) {
 		if (engineTerminated) {
 			std::cout << std::endl;
@@ -139,24 +152,19 @@ int main() {
 			return -1;
 		}
 
-		if (glfwGetKey(mainWindow, GLFW_KEY_G) == GLFW_PRESS) moving = true;
-		else moving = false;
-		if (glfwGetKey(mainWindow, GLFW_KEY_B) == GLFW_PRESS) movingRev = true;
-		else movingRev = false;
-
 		currentTime = glfwGetTime();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//For pressing F to lock and hide the mouse for looking around with the mouse
-		//the boolean "released" is so that input from the key is not received until it has been released
-		if (glfwGetKey(mainWindow, GLFW_KEY_F) && released) {
-			mouseInput = !mouseInput;
-			released = false;
-		}
-		else if (!glfwGetKey(mainWindow, GLFW_KEY_F) && !released) released = true;
+#ifndef LEGACY_INPUT_SYSTEM
+		input::update();	//updates the recorded key presses of the last frame
+		if (input::getNewPress("f")) mouseInput = !mouseInput;
 
+#ifdef DEBUG_INPUT_SYSTEM
+		input::activeScan();
+#endif
+#endif
 		movementInputHandler(mainWindow);
 
 		//hide cursor and set the callback for processing input when mouseInput == true

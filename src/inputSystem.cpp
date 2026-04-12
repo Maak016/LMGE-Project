@@ -26,6 +26,7 @@ float currentGroundLevel = -1.0f;
 glm::vec3 inputMoveVector = glm::vec3(0.0f);
 glm::vec3 currentVelocity = glm::vec3(0.0f);
 void movementInputHandler(GLFWwindow* window) {
+#ifdef LEGACY_INPUT_SYSTEM
 	camRight = glm::cross(camFront, camUp);
 	glm::vec3 heading = -glm::cross(camRight, camUp);
 
@@ -66,6 +67,48 @@ void movementInputHandler(GLFWwindow* window) {
 
 	currentVelocity += inputMoveVector;
 	camPos += currentVelocity * (float)deltaTime;
+#else
+	camRight = glm::cross(camFront, camUp);
+	glm::vec3 heading = -glm::cross(camRight, camUp);
+
+	currentVelocity = camPos - lastPos;
+	lastPos = camPos;
+
+	//Player-Ground collision detection
+	if (camPos.y > currentGroundLevel) onGround = false;
+	else {
+		onGround = true;
+		camPos.y = currentGroundLevel;
+		currentVelocity.y = 0;
+	}
+
+	//ground movement
+	if (onGround) {
+		glm::vec3 vector = glm::vec3(0.0f);
+		vector += static_cast<float>(input::getKey("w") - input::getKey("s")) * heading;
+		vector += static_cast<float>(input::getKey("d") - input::getKey("a")) * camRight;
+
+		if (glm::length(vector) > 0.0f) inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm));
+	}
+
+	//ground counter movement
+	if (onGround) {
+		inputMoveVector.x -= currentVelocity.x * playerWeight * G * deltaTime * 5.0f;
+		inputMoveVector.z -= currentVelocity.z * playerWeight * G * deltaTime * 5.0f;
+	}
+
+	//jumping
+	if (input::getKey("space") && onGround) jump = true;
+
+	if (jump && camPos.y < jumpHeight) currentVelocity.y += jumpStrength * 10.0f;
+	else jump = false;
+
+	//Gravity handling
+	if (!onGround) currentVelocity.y -= G * playerWeight * deltaTime * 15.0f;
+
+	currentVelocity += inputMoveVector;
+	camPos += currentVelocity * (float)deltaTime;
+#endif
 
 #ifdef DEBUG_PLAYER_PHYSICS
 	std::cout << "-------Player physics properties-------\n";
@@ -112,3 +155,50 @@ void mouseMovementCallback(GLFWwindow* window, double xPos, double yPos) {
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); }
+
+void capitalize(std::string& s) {
+	for (char& c : s) {
+		if (c >= 'a' && c <= 'z') c = char(c - ('a' - 'A'));
+	}
+}
+
+GLFWwindow* input::runningWindow;
+std::map<int, bool> pressedKeys;
+std::map<int, bool> newPress;
+
+void input::init(GLFWwindow* window) { runningWindow = window; }
+bool input::getKey(std::string keyCode) {
+	capitalize(keyCode);
+	if (!keyCodes.contains(keyCode)) {
+		std::cout << "ERROR: INPUT_SYSTEM: Key code input '" << keyCode << "' is invalid." << std::endl;
+		engine::terminate();
+		return false;
+	}
+	return pressedKeys.at(keyCodes.at(keyCode));
+}
+bool input::getNewPress(std::string keyCode) {
+	capitalize(keyCode);
+	if (!keyCodes.contains(keyCode)) {
+		std::cout << "ERROR: INPUT_SYSTEM: Key code input '" << keyCode << "' is invalid." << std::endl;
+		engine::terminate();
+		return false;
+	}
+	return newPress.at(keyCodes.at(keyCode));
+}
+
+void input::activeScan() {
+	for (const auto& key : keyCodes) {
+		if (getKey(key.first) && getNewPress(key.first)) std::cout << "LOG: key pressed: " << key.first << " (NEW PRESS)" << std::endl;
+		else if(getKey(key.first)) std::cout << "LOG: key pressed: " << key.first << std::endl;
+	}
+}
+void input::update() {
+	for (const auto& key : keyCodes) {
+		if (glfwGetKey(runningWindow, key.second) == GLFW_PRESS && !pressedKeys.at(key.second)) newPress[key.second] = true;
+		else newPress[key.second] = false;
+
+		if (glfwGetKey(runningWindow, key.second) == GLFW_PRESS) pressedKeys[key.second] = true;
+		else pressedKeys[key.second] = false;
+	}
+	//std::cout << newPress.size() << '\n' << pressedKeys.size() << std::endl;
+}
