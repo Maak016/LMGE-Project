@@ -3,8 +3,6 @@
 #include "inputSystem.h"
 #include "gameObj.h"
 
-bool engineTerminated = false;
-
 double deltaTime = 0;
 double currentTime = 0;
 
@@ -13,63 +11,30 @@ const int scrHeight = 720;
 
 bool mouseInput = false;
 
-void engine::terminate() { engineTerminated = true; }
-
-//-----------Code in this part is only for testing the way the engine works--------------
-bool moving = false;
-bool movingRev = false;
-
-gameObject testingObject;
-gameObject another;
-gameObject yetAnother;
-
-glm::vec3 initialPos = camPos;
-void update() {
-	if (moving) {
-		testingObject.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-		//another.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-	}
-	else if (movingRev) {
-		testingObject.addForce(0, -glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-		//another.addForce(0, glm::normalize(another.instances[0].pos - testingObject.instances[0].pos), 1.0f);
-	}
-
-	//testingObject.instances[1].pos = glm::vec3(initialPos.x, -0.9f, initialPos.z);
+//just for testing
+gameObject yes;
+gameObject yes2;
+void updateYes() {
+	if (input::getNewPress("g")) yes.addForce(0, yes2.getPos(0) - yes.getPos(0), 15.5f);
+	if (input::getNewPress("b")) yes.addForce(0, -(yes2.getPos(0) - yes.getPos(0)), 15.5f);
 }
-void setup(shader& s) {
-	model backpack("assets/scene2/box/box.obj");
-	testingObject.init(backpack, s, nullptr, update, nullptr);
-	//testingObject.setAxisAlignedHitbox(true);
+void setupYes() {
+	model yesM("assets/scene2/box/box.obj");
+	yes.init(yesM, *engine::getRenderShader(), nullptr, updateYes, nullptr);
 
-	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	testingObject.instantiate(glm::vec3(3.4f, -0.9f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	yes.initializePhysicsModel(40.0f, 0.1f);
 
-	//testingObject.instantiate(initialPos, glm::vec3(0.0f, 0.0f, 0.0f));
-
-	testingObject.initializePhysicsModel(25, 0.5);
+	yes.instantiate(4.0f, -1.0f, -3.0f, 0.0f, 0.0f, 0.0f);
 }
-void setup2(shader& s) {
-	model backpack("assets/scene2/box/box.obj");
-	another.init(backpack, s, nullptr, nullptr, nullptr);
-	//testingObject.setAxisAlignedHitbox(true);
+void setupYes2() {
+	model yesM("assets/scene2/box/box.obj");
+	yes2.init(yesM, *engine::getRenderShader(), nullptr, nullptr, nullptr);
 
-	//testingObject.instantiate(glm::vec3(3.4f, -0.4f, 3.7f), glm::vec3(0.0f, 0.0f, 0.0f));
-	another.instantiate(glm::vec3(6.4f, -4.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
-	another.instantiate(glm::vec3(-6.4f, -0.6f, 3.1f), glm::vec3(0.0f, 0.0f, 0.0f));
+	yes2.initializePhysicsModel(50.0f, 0.1f);
 
-	another.initializePhysicsModel(20, 0.5);
+	yes2.instantiate(4.0f, -1.0f, 3.0f, 0.0f, 0.0f, 0.0f);
 }
-//----------------------------------------------------------------------------------------
-
-gameObject player;
-void playerModelUpdate() { player.instances[0].pos = camPos; }
-void setupPlayerCollision(shader& renderShader) {
-	model hoomanYes("assets/defaultAssets/playerModel/model.obj");
-	player.init(hoomanYes, renderShader, nullptr, playerModelUpdate, nullptr);
-	player.initializePhysicsModel(70.0f, 1.0f);
-
-	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
-}
+//
 
 int main() {
 	if (glfwInit() != GLFW_TRUE) std::cout << "ERROR: GLFW initialization failed." << std::endl;
@@ -116,15 +81,14 @@ int main() {
 #endif
 
 #endif
-
-	setupPlayerCollision(mainShader);
-
-	//just for testing
-	setup(mainShader);
-	setup2(mainShader);
+	engine::setRenderShader(&mainShader);
+	engine::setupPlayerCollider();
 	
 	skybox normSkybox;
-	normSkybox.init("assets/scene2/skyboxNorm", ".jpg");
+	normSkybox.init("assets/defaultAssets/skybox", ".jpg");
+
+	setupYes();
+	setupYes2();
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
@@ -146,7 +110,7 @@ int main() {
 	input::init(mainWindow);
 #endif
 	while (!glfwWindowShouldClose(mainWindow)) {
-		if (engineTerminated) {
+		if (engine::engineTerminated()) {
 			std::cout << std::endl;
 			std::cout << "ERROR: LMGE: ENGINE TERMINATED." << std::endl;
 			return -1;
@@ -165,7 +129,6 @@ int main() {
 		input::activeScan();
 #endif
 #endif
-		movementInputHandler(mainWindow);
 
 		//hide cursor and set the callback for processing input when mouseInput == true
 		if (mouseInput) {
@@ -184,7 +147,7 @@ int main() {
 		glDisable(GL_CULL_FACE);
 		if(activeSkybox != nullptr) activeSkybox->update(viewMatrix, projectionMatrix);
 
-		mainShader.use();
+		engine::getRenderShader()->use();
 
 		//setting the data for the matricesBlock uniform buffer
 		//each matrix takes 64 bytes
@@ -195,13 +158,13 @@ int main() {
 
 #ifndef DISABLE_LIGHTING
 		for (lightSource* light : allLights) {
-			light->bind(mainShader, camPos);
+			light->bind(*engine::getRenderShader(), camPos);
 		}
-		mainShader.uniform(float1, "ambientStrength", {0.6f});
+		engine::getRenderShader()->uniform(float1, "ambientStrength", {0.6f});
 #endif
 		glEnable(GL_CULL_FACE);
 
-		mainShader.uniformBlock("matrices", 0);
+		engine::getRenderShader()->uniformBlock("matrices", 0);
 
 		for (int i = 0; i < allObjects.size(); i++) {
 			allObjects[i]->update();

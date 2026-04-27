@@ -6,6 +6,7 @@ extern const int scrWidth;
 extern const int scrHeight;
 
 extern glm::vec3 camPos;
+extern glm::vec3 camUp;
 extern glm::vec3 camFront;
 extern double pitch, yaw;
 
@@ -146,8 +147,21 @@ namespace input {
 		{"RIGHT_SUPER", GLFW_KEY_RIGHT_SUPER},
 		{"MENU", GLFW_KEY_MENU} };
 
+	const std::map <std::string, int> mouseButtons = 
+	{ {"MOUSE_LEFT", GLFW_MOUSE_BUTTON_1},
+	  {"MOUSE_RIGHT", GLFW_MOUSE_BUTTON_2},
+	  {"MOUSE_MIDDLE", GLFW_MOUSE_BUTTON_3},
+	  {"MOUSE_4", GLFW_MOUSE_BUTTON_4},
+	  {"MOUSE_5", GLFW_MOUSE_BUTTON_5},
+	  {"MOUSE_6", GLFW_MOUSE_BUTTON_6},
+	  {"MOUSE_7", GLFW_MOUSE_BUTTON_7},
+	  {"MOUSE_8", GLFW_MOUSE_BUTTON_8},
+	};
+
 	void activeScan();
 	void update();
 	bool getKey(std::string keyCode);
 	bool getNewPress(std::string keyCode);
+	bool getMouse(std::string button);
+	bool getNewMousePress(std::string button);
 }

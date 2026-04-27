@@ -47,6 +47,8 @@ private:
 	void simObjectPhysics(const unsigned int instanceIndex);
 	std::vector<glm::mat4> getInstanceModel();
 	void bindInstanceModel();
+
+	std::vector<std::vector<unsigned int>> checkedInstances; //form: {{i, j}} with i being the gameObject ID and the j being the instance index
 public:
 	std::vector<instance> instances;
 
@@ -100,3 +102,11 @@ public:
 
 extern gameObject player;
 extern std::vector<gameObject*> allObjects;
+
+namespace engine {
+	extern gameObject player;
+	void setupPlayerCollider();
+	void setupPlayerCollider(shader& renderShader);
+
+	void defaultPlayerControl();
+}

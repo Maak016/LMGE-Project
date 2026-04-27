@@ -1,5 +1,5 @@
 <h2>
--Torque for object translation<br>
+-Center of Gravity calculation & Torque for object translation<br>
 -Ray shooting<br>
--Input processing system allowing for new press checks and other actions<br>
+-Allow player to also be affected by physics<br>
 </h2>

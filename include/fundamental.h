@@ -19,6 +19,8 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "engineGovernor.h"
+
 //#define DEBUG_WORLD_PHYSICS
 //#define DEBUG_PLAYER_PHYSICS
 //#define DEBUG_RENDERING
@@ -32,10 +34,3 @@
 #define DISABLE_GRAVITY
 
 extern double deltaTime;
-
-namespace engine {
-	void terminate();
-}
-namespace physicsConstants {
-	const float G = 9.81;
-}

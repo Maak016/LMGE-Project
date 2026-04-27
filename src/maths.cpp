@@ -351,8 +351,8 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 	//std::cout << mtvMag << ", " << '(' << mtvVec.x << ',' << mtvVec.y << ',' << mtvVec.z << ')' << std::endl;
 
 	if (!first->trigger() && !second->trigger()) {
-		first->translate(firstIndex, mtvVec, mtvMag / 2.0f + 0.01f);
-		second->translate(secIndex, -mtvVec, mtvMag / 2.0f + 0.01f);
+		first->translate(firstIndex, -mtvVec, mtvMag / 2.0f + 0.01f);
+		second->translate(secIndex, mtvVec, mtvMag / 2.0f + 0.01f);
 
 		//calculate the force of the impact (using work-kinetic energy theorem) and add it to both of the objects, making them "bounce"
 		glm::vec3 firstPos = first->instances[firstIndex].pos;
@@ -366,8 +366,10 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 
 		float forceMag = (avgWeight * pow(v, 2)) / (2 * d);
 
-		first->addForce(firstIndex, glm::normalize(mtvVec), forceMag * 0.4f);
-		second->addForce(secIndex, glm::normalize(-mtvVec), forceMag * 0.4f);
+		std::cout << 'v' << v << '\n' << 'w' << avgWeight << '\n' << 'd' << d << '\n' << 'f' << forceMag << std::endl;
+
+		first->addForce(firstIndex, glm::normalize(-mtvVec), d * v * avgWeight * 15);
+		second->addForce(secIndex, glm::normalize(mtvVec), d * v * avgWeight * 15);
 	}
 #endif
 

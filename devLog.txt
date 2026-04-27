@@ -14,3 +14,35 @@ Rendering Pre-processor directive changes: MINOR CHANGES
 Input detection system: STABLE
 - Adapted default input functionalities to the new system
 - Added error proofing for non-existent key codes
+
+[16/4/26]
+Input detection system: IMPLEMENTED EXPANSION
+- System now allows for detecting mouse button inputs
+
+[18/4/26]
+Player physics: UPDATED & MAJOR INTERNAL CHANGE
+- Instead of being buit into the input system, player is now controlled through the movement of a gameobject -> properly affected by physics
+- Old default player control code which directly moves the camera for movement control now removed. Basically, the camera now follows the gameObject, as opposed
+to the gameObject following the camera previously.
+
+Central Game Engine Control System added: MOSTLY STABLE BUT LACKING FEATURE
+- Added namespace "engine" which grants master control of the game engine, allowing for such tasks as terminating the engine instantly, dictating the rendering
+shader of the whole engine, etc.
+
+[20/4/26]
+Player physics: INCOMPLETE
+- Attempted to migrate the controller of player movement to gameObject's physics simulation
+- Need to find another way instead of directly modifying the player velocity, which is to be overridden by gameObject::simObjectPhysics()
+
+[26/4/26]
+Player physics: ACCEPTABLE
+- Camera now follows player gameObject instead of the object following the camera, thus allowing the player to be affected by physics stuff
+
+PROBLEM: Physics
+- The force added to objects in collision are too high. A factor aggravating it is that the same pair of objects can be involved in two collision checks. 
+Proposed fix: adding trackers for pairs of instances that have been checked, thus reducing the number of checks by half while also eliminating the issue above.
+
+[28/4/26]
+Physics: STILL BUGGY
+- Tweaks made to translational forces on an object involved in a collision
+- However, the physics is still highly unnatural and interaction of objects with player is still UNUSABLE

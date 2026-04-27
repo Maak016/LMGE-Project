@@ -304,3 +304,8 @@ void shader::uniformBlock(std::string name, unsigned int binding) {
 }
 
 void shader::use() { glUseProgram(program); }
+
+shader* mainRenderShader = nullptr;
+//namespace engine
+shader* engine::getRenderShader() { return mainRenderShader; }
+void engine::setRenderShader(shader* s) { mainRenderShader = s; }

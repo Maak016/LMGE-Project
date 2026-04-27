@@ -45,8 +45,7 @@ void gameObject::update() {
 		engine::terminate();
 	}
 
-	if (updateFunc != nullptr)
-	updateFunc();
+	if (updateFunc != nullptr) updateFunc();
 
 #ifdef DISABLE_INSTANCING
 	for (int i = 0; i < instances.size(); i++) {
@@ -101,6 +100,7 @@ void gameObject::postFrameCleanup() {
 		instances[i].colliding = false;
 		instances[i].collidees.clear();
 	}
+	this->checkedInstances.clear();
 }
 
 void gameObject::runtimeInit() { if(initFunc != nullptr) initFunc(); }
@@ -125,12 +125,22 @@ void gameObject::collisionState(bool state, unsigned int collideeIndex, instance
 }
 
 bool gameObject::collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex) {
-	
 	for (int i = 0; i < all.size(); i++) {
-		//if (all[i]->getObjectID() == this->objectID) continue;
-
 		for (int j = 0; j < all[i]->instances.size(); j++) {
-			if (all[i]->getObjectID() == this->objectID && j == colliderIndex) continue;
+			bool validCheck = true;
+
+			//optimization: check if the current pair of instances have been checked for collision in the past in the current frame, thus reducing total number of checks
+			if (all[i]->getObjectID() == this->objectID && j == colliderIndex) validCheck = false;
+			
+			for (const std::vector<unsigned int>& instance : checkedInstances)
+				if (instance[0] == all[i]->getObjectID() && instance[1] == j) validCheck = false;
+			for (const std::vector<unsigned int>& instance : all[i]->checkedInstances)
+				if (instance[0] == this->objectID && instance[1] == colliderIndex) validCheck = false;
+
+			if (!validCheck) continue;
+			//check passed: add the current pair to the history of checked pairs in the current frame
+			this->checkedInstances.push_back({all[i]->getObjectID(), (unsigned int)j});
+			all[i]->checkedInstances.push_back({ this->objectID, colliderIndex });
 
 			//check for collision: returns true if the coordinates of the two objects have a common area.
 			bool collision = false;
@@ -389,4 +399,97 @@ void gameObject::simObjectPhysics(const unsigned int instanceIndex) {
 #endif
 
 	currentInstance->pos += (currentInstance->currentVelocity + currentInstance->inputMoveVector) * static_cast<float>(deltaTime);
+}
+
+#include "inputSystem.h"
+gameObject engine::player;
+//namespace engine
+
+glm::vec3 camPos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 camFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 camUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 camRight;
+
+const double moveSpeedNorm = 10.0f;
+const double moveSpeedFast = 2.0 * moveSpeedNorm;
+const float jumpHeight = 5.0f;
+const float jumpStrength = 5.0f;
+
+bool onGround = false;
+bool jump = false;
+
+constexpr float G = 9.81;
+const float playerWeight = 70;
+
+glm::vec3 lastPos = camPos;		//The position of the player in the last frame
+float currentGroundLevel = -1.0f;
+
+glm::vec3 inputMoveVector = glm::vec3(0.0f);
+glm::vec3 currentVelocity = glm::vec3(0.0f);
+
+void engine::defaultPlayerControl() {
+	camRight = glm::cross(camFront, camUp);
+	glm::vec3 heading = -glm::cross(camRight, camUp);
+
+	//Player-Ground collision detection
+	if (player.instances[0].pos.y > currentGroundLevel) onGround = false;
+	else {
+		onGround = true;
+		player.instances[0].pos.y = currentGroundLevel;
+		player.instances[0].currentVelocity.y = 0;
+	}
+
+	//ground movement
+	if (onGround) {
+		glm::vec3 vector = glm::vec3(0.0f);
+		vector += static_cast<float>(input::getKey("w") - input::getKey("s")) * heading;
+		vector += static_cast<float>(input::getKey("d") - input::getKey("a")) * camRight;
+
+		if (glm::length(vector) > 0.0f) player.instances[0].inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm));
+	}
+
+	//ground counter movement
+	if (onGround) {
+		player.instances[0].inputMoveVector.x -= player.instances[0].currentVelocity.x * player.getWeight() * G * deltaTime * 10.0f;
+		player.instances[0].inputMoveVector.z -= player.instances[0].currentVelocity.z * player.getWeight() * G * deltaTime * 10.0f;
+	}
+
+	//jumping
+	if (input::getKey("space") && onGround) jump = true;
+
+	if (jump && player.instances[0].pos.y < jumpHeight) player.instances[0].currentVelocity.y += jumpStrength * 10.0f;
+	else jump = false;
+
+	//Gravity handling
+	if (!onGround) player.instances[0].currentVelocity.y -= G * player.getWeight() * deltaTime * 15.0f;
+
+	player.instances[0].currentVelocity += player.instances[0].inputMoveVector;
+	player.instances[0].pos += player.instances[0].currentVelocity * (float)deltaTime;
+	//player.instances[0].inputMoveVector += player.instances[0].currentVelocity + player.instances[0].inputMoveVector;
+
+#ifdef DEBUG_PLAYER_PHYSICS
+	std::cout << "-------Player physics properties-------\n";
+	std::cout << "LOG: Current player position: " << '(' << camPos.x << ',' << camPos.y << ',' << camPos.z << ')' << '\n';
+	std::cout << "LOG: Current player move velocity: " << '(' << currentVelocity.x << ',' << currentVelocity.y << ',' << currentVelocity.z << ')' << '\n';
+	std::cout << "LOG: Player jumping/in air status: " << !onGround << '\n';
+
+	std::cout << std::endl;
+#endif
+	camPos = player.instances[0].pos;
+}
+
+
+void engine::setupPlayerCollider(shader& renderShader) {
+	model hoomanModel("assets/defaultAssets/playerModel/model.obj");
+	player.init(hoomanModel, renderShader, nullptr, defaultPlayerControl, nullptr);
+	player.initializePhysicsModel(70.0f, 1.0f);
+
+	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
+}
+void engine::setupPlayerCollider() {
+	model hoomanModel("assets/defaultAssets/playerModel/model.obj");
+	player.init(hoomanModel, *getRenderShader(), nullptr, defaultPlayerControl, nullptr);
+	player.initializePhysicsModel(70.0f, 1.0f);
+
+	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
 }

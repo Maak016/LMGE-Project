@@ -137,6 +137,7 @@
     <ClCompile Include="assets\scene1\yes.cpp" />
     <ClCompile Include="src\gameObj.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\governor.cpp" />
     <ClCompile Include="src\inputSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\maths.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\engineGovernor.h" />
     <ClInclude Include="include\fundamental.h" />
     <ClInclude Include="include\gameObj.h" />
     <ClInclude Include="include\inputSystem.h" />

@@ -24,6 +24,12 @@ public:
 
 	void use();
 };
+extern shader* mainRenderShader;
+
+namespace engine {
+	shader* getRenderShader();
+	void setRenderShader(shader* s);
+}
 
 //----------For light source class---------
 extern unsigned int numActiveDirLight, numActivePointLight;

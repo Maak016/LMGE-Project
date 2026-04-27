@@ -1,132 +1,9 @@
 #include "inputSystem.h"
 
-glm::vec3 camPos = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 camFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 camUp = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 camRight;
 const float FOV = 45.0f;
 const float mouseSensitivity = 0.001f;
 double pitch = 0;
 double yaw = 0;
-
-const double moveSpeedNorm = 10.0f;
-const double moveSpeedFast = 2.0 * moveSpeedNorm;
-const float jumpHeight = 5.0f;
-const float jumpStrength = 5.0f;
-
-bool onGround = false;
-bool jump = false;
-
-constexpr float G = 9.81;
-const float playerWeight = 70;
-
-glm::vec3 lastPos = camPos;		//The position of the player in the last frame
-float currentGroundLevel = -1.0f;
-
-glm::vec3 inputMoveVector = glm::vec3(0.0f);
-glm::vec3 currentVelocity = glm::vec3(0.0f);
-void movementInputHandler(GLFWwindow* window) {
-#ifdef LEGACY_INPUT_SYSTEM
-	camRight = glm::cross(camFront, camUp);
-	glm::vec3 heading = -glm::cross(camRight, camUp);
-
-	currentVelocity = camPos - lastPos;
-	lastPos = camPos;
-
-	//Player-Ground collision detection
-	if (camPos.y > currentGroundLevel) onGround = false;
-	else {
-		onGround = true;
-		camPos.y = currentGroundLevel;
-		currentVelocity.y = 0;
-	}
-
-	//ground movement
-	if (onGround) {
-		glm::vec3 vector = glm::vec3(0.0f);
-		vector += static_cast<float>(glfwGetKey(window, GLFW_KEY_W) - glfwGetKey(window, GLFW_KEY_S)) * heading;
-		vector += static_cast<float>(glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A)) * camRight;
-
-		if (glm::length(vector) > 0.0f) inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) ? moveSpeedFast : moveSpeedNorm));
-	}
-
-	//ground counter movement
-	if (onGround) {
-		inputMoveVector.x -= currentVelocity.x * playerWeight * G * deltaTime * 5.0f;
-		inputMoveVector.z -= currentVelocity.z * playerWeight * G * deltaTime * 5.0f;
-	}
-
-	//jumping
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && onGround) jump = true;
-
-	if (jump && camPos.y < jumpHeight) currentVelocity.y += jumpStrength * 10.0f;
-	else jump = false;
-
-	//Gravity handling
-	if(!onGround) currentVelocity.y -= G * playerWeight * deltaTime * 15.0f;
-
-	currentVelocity += inputMoveVector;
-	camPos += currentVelocity * (float)deltaTime;
-#else
-	camRight = glm::cross(camFront, camUp);
-	glm::vec3 heading = -glm::cross(camRight, camUp);
-
-	currentVelocity = camPos - lastPos;
-	lastPos = camPos;
-
-	//Player-Ground collision detection
-	if (camPos.y > currentGroundLevel) onGround = false;
-	else {
-		onGround = true;
-		camPos.y = currentGroundLevel;
-		currentVelocity.y = 0;
-	}
-
-	//ground movement
-	if (onGround) {
-		glm::vec3 vector = glm::vec3(0.0f);
-		vector += static_cast<float>(input::getKey("w") - input::getKey("s")) * heading;
-		vector += static_cast<float>(input::getKey("d") - input::getKey("a")) * camRight;
-
-		if (glm::length(vector) > 0.0f) inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm));
-	}
-
-	//ground counter movement
-	if (onGround) {
-		inputMoveVector.x -= currentVelocity.x * playerWeight * G * deltaTime * 5.0f;
-		inputMoveVector.z -= currentVelocity.z * playerWeight * G * deltaTime * 5.0f;
-	}
-
-	//jumping
-	if (input::getKey("space") && onGround) jump = true;
-
-	if (jump && camPos.y < jumpHeight) currentVelocity.y += jumpStrength * 10.0f;
-	else jump = false;
-
-	//Gravity handling
-	if (!onGround) currentVelocity.y -= G * playerWeight * deltaTime * 15.0f;
-
-	currentVelocity += inputMoveVector;
-	camPos += currentVelocity * (float)deltaTime;
-#endif
-
-#ifdef DEBUG_PLAYER_PHYSICS
-	std::cout << "-------Player physics properties-------\n";
-	std::cout << "LOG: Current player position: " << '(' << camPos.x << ',' << camPos.y << ',' << camPos.z << ')' << '\n';
-	std::cout << "LOG: Current player move velocity: " << '(' << currentVelocity.x << ',' << currentVelocity.y << ',' << currentVelocity.z << ')' << '\n';
-	std::cout << "LOG: Player jumping/in air status: " << !onGround << '\n';
-
-	std::cout << std::endl;
-#endif
-}
-
-glm::vec3 getMovementVector() { return currentVelocity; }
-void addForce(glm::vec3 direction, float magnitude) {
-	direction = glm::normalize(direction);
-	direction *= magnitude * static_cast<float>(deltaTime);
-
-	currentVelocity += direction;
-}
 
 double lastX = scrWidth / 2;
 double lastY = scrHeight / 2;
@@ -186,10 +63,33 @@ bool input::getNewPress(std::string keyCode) {
 	return newPress.at(keyCodes.at(keyCode));
 }
 
+bool input::getMouse(std::string button) {
+	capitalize(button);
+	if (!mouseButtons.contains(button)) {
+		std::cout << "ERROR: INPUT_SYSTEM: Key code input '" << button << "' is invalid." << std::endl;
+		engine::terminate();
+		return false;
+	}
+	return pressedKeys.at(mouseButtons.at(button));
+}
+bool input::getNewMousePress(std::string button) {
+	capitalize(button);
+	if (!mouseButtons.contains(button)) {
+		std::cout << "ERROR: INPUT_SYSTEM: Key code input '" << button << "' is invalid." << std::endl;
+		engine::terminate();
+		return false;
+	}
+	return newPress.at(mouseButtons.at(button));
+}
+
 void input::activeScan() {
 	for (const auto& key : keyCodes) {
 		if (getKey(key.first) && getNewPress(key.first)) std::cout << "LOG: key pressed: " << key.first << " (NEW PRESS)" << std::endl;
 		else if(getKey(key.first)) std::cout << "LOG: key pressed: " << key.first << std::endl;
+	}
+	for (const auto& button : mouseButtons) {
+		if(getMouse(button.first) && getNewMousePress(button.first)) std::cout << "LOG: key pressed: " << button.first << " (NEW PRESS)" << std::endl;
+		else if(getMouse(button.first)) std::cout << "LOG: key pressed: " << button.first << std::endl;
 	}
 }
 void input::update() {
@@ -199,6 +99,13 @@ void input::update() {
 
 		if (glfwGetKey(runningWindow, key.second) == GLFW_PRESS) pressedKeys[key.second] = true;
 		else pressedKeys[key.second] = false;
+	}
+	for (const auto& button : mouseButtons) {
+		if (glfwGetMouseButton(runningWindow, button.second) == GLFW_PRESS && !pressedKeys.at(button.second)) newPress[button.second] = true;
+		else newPress[button.second] = false;
+
+		if (glfwGetMouseButton(runningWindow, button.second) == GLFW_PRESS) pressedKeys[button.second] = true;
+		else pressedKeys[button.second] = false;
 	}
 	//std::cout << newPress.size() << '\n' << pressedKeys.size() << std::endl;
 }
