@@ -91,6 +91,7 @@ void gameObject::update() {
 		}
 
 		if (physicsModelEnabled && physicsAttribLoaded) simObjectPhysics(i);
+		if (stationary) instances[i].pos = instances[i].lastPos;
 	}
 
 #endif
@@ -105,11 +106,15 @@ void gameObject::postFrameCleanup() {
 
 void gameObject::runtimeInit() { if(initFunc != nullptr) initFunc(); }
 
-void gameObject::instantiate(glm::vec3 pos, glm::vec3 rot) { instances.push_back({this->objectID, pos, rot, false, false, {}, pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f) }); }
+void gameObject::instantiate(glm::vec3 pos, glm::vec3 rot) { 
+	instances.push_back({this->objectID, pos, rot, false, false, {}, pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f) }); 
+	if (stationary) this->instances[instances.size() - 1].lastPos = pos;
+}
 void gameObject::instantiate(float x, float y, float z, float rotX, float rotY, float rotZ) {
 	glm::vec3 pos = glm::vec3(x, y, z);
 	glm::vec3 rot = glm::vec3(rotX, rotY, rotZ);
 	instances.push_back({this->objectID, pos, rot, false, false, {}, pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)});
+	if (stationary) this->instances[instances.size() - 1].lastPos = pos;
 }
 
 std::vector<std::vector<glm::vec3>> gameObject::hitbox() { return hitboxRegion; }
@@ -345,9 +350,14 @@ void gameObject::freeInstanceMemory(const unsigned int instanceIndex) {
 void gameObject::destroyInstance(const unsigned int instanceIndex) { this->instances[instanceIndex].destroyed = true; }
 void gameObject::reinstate(const unsigned int instanceIndex) { this->instances[instanceIndex].destroyed = false; }
 
-void gameObject::initializePhysicsModel(float weight, float softness) {
+/*
+* weight: the weight in kilograms of the object. this impacts the effect of forces acting on the object
+* softness: 0.0f means hardest, 1.0f is softest
+*/
+void gameObject::initializePhysicsModel(float weight, float softness, float bounciness) {
 	this->objectWeight = weight;
 	this->softness = softness;
+	this->bounciness = bounciness;
 
 	this->physicsAttribLoaded = true;
 	this->physicsModelEnabled = true;
@@ -360,10 +370,13 @@ void gameObject::setPhysicsModelStatus(bool state) {
 	}
 	physicsModelEnabled = state;
 }
+void gameObject::setStationaryState(bool state) { this->stationary = state; }
 
 bool gameObject::physicsModelLoadStatus() { return this->physicsAttribLoaded; }
 float gameObject::getWeight() { return this->objectWeight; }
 float gameObject::getSoftness() { return this->softness; }
+float gameObject::getBounciness() { return this->bounciness; }
+bool gameObject::getStationaryState() { return this->stationary; }
 
 float gameObject::getSpeed(const unsigned int instanceIndex) {
 	return glm::length(instances[instanceIndex].currentVelocity) / deltaTime;
@@ -386,19 +399,19 @@ void gameObject::addForce(const unsigned int instanceIndex, glm::vec3 dir, float
 	this->instances[instanceIndex].inputMoveVector += (dir * mag * 0.05f) / (this->objectWeight * 0.5f);
 }
 
+bool grav = false;
 void gameObject::simObjectPhysics(const unsigned int instanceIndex) {
 	instance* currentInstance = &this->instances[instanceIndex];
 
-	//calculate current moving velocity & speed
-	currentInstance->currentVelocity = currentInstance->pos - currentInstance->lastPos;
-	currentInstance->lastPos = currentInstance->pos;
-
+	if (this->stationary) return;
 	//simulate gravity
 #ifndef DISABLE_GRAVITY
-	currentInstance->currentVelocity.y -= physicsConstants::G * this->objectWeight * deltaTime * 15.0f;
+	if (grav) this->addForce(instanceIndex, glm::vec3(0.0f, -1.0f, 0.0f), physicsConstants::G);
 #endif
 
-	currentInstance->pos += (currentInstance->currentVelocity + currentInstance->inputMoveVector) * static_cast<float>(deltaTime);
+	currentInstance->currentVelocity += currentInstance->inputMoveVector;
+	currentInstance->pos += (currentInstance->currentVelocity) * static_cast<float>(deltaTime);
+	currentInstance->inputMoveVector = glm::vec3(0.0f);
 }
 
 #include "inputSystem.h"
@@ -431,6 +444,12 @@ void engine::defaultPlayerControl() {
 	camRight = glm::cross(camFront, camUp);
 	glm::vec3 heading = -glm::cross(camRight, camUp);
 
+	//Player ground contact detection
+#if 0
+
+	camRight = glm::cross(camFront, camUp);
+	glm::vec3 heading = -glm::cross(camRight, camUp);
+
 	//Player-Ground collision detection
 	if (player.instances[0].pos.y > currentGroundLevel) onGround = false;
 	else {
@@ -445,13 +464,18 @@ void engine::defaultPlayerControl() {
 		vector += static_cast<float>(input::getKey("w") - input::getKey("s")) * heading;
 		vector += static_cast<float>(input::getKey("d") - input::getKey("a")) * camRight;
 
-		if (glm::length(vector) > 0.0f) player.instances[0].inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm));
+		//if (glm::length(vector) > 0.0f) player.instances[0].inputMoveVector += glm::normalize(vector) * static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm));
+		if(glm::length(vector) > 0.0f)
+		player.addForce(0, glm::normalize(vector), static_cast<float>(deltaTime * (input::getKey("left_shift") ? moveSpeedFast : moveSpeedNorm)));
 	}
 
 	//ground counter movement
 	if (onGround) {
-		player.instances[0].inputMoveVector.x -= player.instances[0].currentVelocity.x * player.getWeight() * G * deltaTime * 10.0f;
-		player.instances[0].inputMoveVector.z -= player.instances[0].currentVelocity.z * player.getWeight() * G * deltaTime * 10.0f;
+		//player.instances[0].inputMoveVector.x -= player.instances[0].currentVelocity.x * player.getWeight() * G * deltaTime * 10.0f;
+		//player.instances[0].inputMoveVector.z -= player.instances[0].currentVelocity.z * player.getWeight() * G * deltaTime * 10.0f;
+		glm::vec3 xz = glm::vec3(player.instances[0].currentVelocity.x, 0.0f, player.instances[0].currentVelocity.z);
+
+		player.addForce(0, -glm::normalize(xz), glm::length(xz) * player.getWeight() * G * 10.0f);
 	}
 
 	//jumping
@@ -463,8 +487,8 @@ void engine::defaultPlayerControl() {
 	//Gravity handling
 	if (!onGround) player.instances[0].currentVelocity.y -= G * player.getWeight() * deltaTime * 15.0f;
 
-	player.instances[0].currentVelocity += player.instances[0].inputMoveVector;
-	player.instances[0].pos += player.instances[0].currentVelocity * (float)deltaTime;
+	//player.instances[0].currentVelocity += player.instances[0].inputMoveVector;
+	//player.instances[0].pos += player.instances[0].currentVelocity * (float)deltaTime;
 	//player.instances[0].inputMoveVector += player.instances[0].currentVelocity + player.instances[0].inputMoveVector;
 
 #ifdef DEBUG_PLAYER_PHYSICS
@@ -476,20 +500,22 @@ void engine::defaultPlayerControl() {
 	std::cout << std::endl;
 #endif
 	camPos = player.instances[0].pos;
+
+#endif
 }
 
 
 void engine::setupPlayerCollider(shader& renderShader) {
 	model hoomanModel("assets/defaultAssets/playerModel/model.obj");
 	player.init(hoomanModel, renderShader, nullptr, defaultPlayerControl, nullptr);
-	player.initializePhysicsModel(70.0f, 1.0f);
+	player.initializePhysicsModel(70.0f, 1.0f, 1.0f);
 
 	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
 }
 void engine::setupPlayerCollider() {
 	model hoomanModel("assets/defaultAssets/playerModel/model.obj");
 	player.init(hoomanModel, *getRenderShader(), nullptr, defaultPlayerControl, nullptr);
-	player.initializePhysicsModel(70.0f, 1.0f);
+	player.initializePhysicsModel(70.0f, 1.0f, 1.0f);
 
 	player.instantiate(camPos, glm::vec3(0.0f, 0.0f, 0.0f));
 }

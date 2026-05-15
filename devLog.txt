@@ -46,3 +46,30 @@ Proposed fix: adding trackers for pairs of instances that have been checked, thu
 Physics: STILL BUGGY
 - Tweaks made to translational forces on an object involved in a collision
 - However, the physics is still highly unnatural and interaction of objects with player is still UNUSABLE
+
+[5/1/26]
+Physics: BETTER BUT STILL PROBLEMATIC
+- Tweaks made to bouncing calculation and gravity variables, so these areas now behave much better
+- Softness is now a direct coefficient for bouncing force, meaning at 1.0f, bouncing force is *= 0, and at 0.0f, force is *= 1
+- Bug fix: gameObject::instance::inputMoveVector (stores input force) was previously saved after each addForce() call, leading to the same force being effected
+multiple times. Now the force is added to instance::currentVelocity once and is subsequently reset to (0.0f, 0.0f, 0.0f)
+- However, Gravity is still highly chaotic and causes objects to get shot into space. NEED FIX.
+
+Player physics: CODE DELETED. REWRITE PENDING.
+
+[10/5/26]
+Physics: MORE ROBUST
+- Instead of entirely relying on forces. a check to see if an object is colliding with a surface on which it can lie will be done (y-component of MTV
+exceeding a certain value, set to 0.5f for now). If true, the force that is applied will just be to cancel out gravity.
+- Changes made to force calculation. Now it is more realistic.
+
+[12/5/26]
+Physics: PROBLEMATIC
+- Added a paramemter of bounciness to objects
+- Bug: Object stays grounded and does not bounce even when there is strong bouncing force acting on it
+- Bug: Object jittering around up and down when standing on a slope.
+- Dev tired.
+
+[15/5/26]
+Physics: Gravity simulation is more robust
+- Added a "stationary" attribute for gameObject objects. This attribute has the ability to affect the forces and translation of other colliding objects

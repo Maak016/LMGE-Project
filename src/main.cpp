@@ -14,25 +14,44 @@ bool mouseInput = false;
 //just for testing
 gameObject yes;
 gameObject yes2;
+gameObject yesGround;
 void updateYes() {
 	if (input::getNewPress("g")) yes.addForce(0, yes2.getPos(0) - yes.getPos(0), 15.5f);
 	if (input::getNewPress("b")) yes.addForce(0, -(yes2.getPos(0) - yes.getPos(0)), 15.5f);
+
+	//if (glm::length(yes.instances[0].inputMoveVector) > 0)
+	//std::cout << yes.instances[0].inputMoveVector.x << ' ' << yes.instances[0].inputMoveVector.y << ' ' << yes.instances[0].inputMoveVector.z << std::endl;
+	//std::cout << yes.instances[0].currentVelocity.y << std::endl;
+}
+void updateNo() {
+	//yesGround.instances[0].pos = glm::vec3(4.0f, -4.0f, -3.0f);
+	//yes2.instances[0].pos = glm::vec3(4.0f, 1.0f, 3.0f);
 }
 void setupYes() {
 	model yesM("assets/scene2/box/box.obj");
 	yes.init(yesM, *engine::getRenderShader(), nullptr, updateYes, nullptr);
 
-	yes.initializePhysicsModel(40.0f, 0.1f);
+	yes.initializePhysicsModel(50.0f, 0.0f, 1.0f);
 
-	yes.instantiate(4.0f, -1.0f, -3.0f, 0.0f, 0.0f, 0.0f);
+	yes.instantiate(4.0f, 1.0f, -3.0f, 0.0f, 0.0f, 0.0f);
+}
+void setupNo() {
+	model yesM("assets/scene2/box/box.obj");
+	yesGround.init(yesM, *engine::getRenderShader(), nullptr, updateNo, nullptr);
+
+	yesGround.setStationaryState(true);
+	yesGround.initializePhysicsModel(10.0f, 0.0f, 0.0f);
+
+	yesGround.instantiate(4.1f, -4.0f, -3.1f, 0.0f, 0.0f, 0.0f);
 }
 void setupYes2() {
 	model yesM("assets/scene2/box/box.obj");
 	yes2.init(yesM, *engine::getRenderShader(), nullptr, nullptr, nullptr);
 
-	yes2.initializePhysicsModel(50.0f, 0.1f);
+	yes2.setStationaryState(1);
+	yes2.initializePhysicsModel(10.0f, 0.0f, 5.0f);
 
-	yes2.instantiate(4.0f, -1.0f, 3.0f, 0.0f, 0.0f, 0.0f);
+	yes2.instantiate(4.0f, 1.0f, 3.0f, 0.0f, 0.0f, 0.0f);
 }
 //
 
@@ -88,6 +107,7 @@ int main() {
 	normSkybox.init("assets/defaultAssets/skybox", ".jpg");
 
 	setupYes();
+	setupNo();
 	setupYes2();
 
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
@@ -130,6 +150,8 @@ int main() {
 #endif
 #endif
 
+		if (input::getMouse("mouse_right")) grav = true;
+		else grav = false;
 		//hide cursor and set the callback for processing input when mouseInput == true
 		if (mouseInput) {
 			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

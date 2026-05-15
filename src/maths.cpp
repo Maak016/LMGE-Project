@@ -351,8 +351,19 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 	//std::cout << mtvMag << ", " << '(' << mtvVec.x << ',' << mtvVec.y << ',' << mtvVec.z << ')' << std::endl;
 
 	if (!first->trigger() && !second->trigger()) {
-		first->translate(firstIndex, -mtvVec, mtvMag / 2.0f + 0.01f);
-		second->translate(secIndex, mtvVec, mtvMag / 2.0f + 0.01f);
+		first->translate(firstIndex, -mtvVec, second->getStationaryState() ? mtvMag + 0.01f : mtvMag / 2.0f + 0.01f);
+		second->translate(secIndex, mtvVec, first->getStationaryState() ? mtvMag + 0.01f : mtvMag / 2.0f + 0.01f);
+
+		if (first->getStationaryState() && !second->getStationaryState()) {
+			second->translate(secIndex, mtvVec, mtvMag + 0.01f);
+		}
+		else if (!first->getStationaryState() && second->getStationaryState()) {
+			first->translate(firstIndex, -mtvVec, mtvMag + 0.01f);
+		}
+		else{
+			first->translate(firstIndex, -mtvVec, mtvMag / 2.0f + 0.01f);
+			second->translate(secIndex, mtvVec, mtvMag / 2.0f + 0.01f);
+		}
 
 		//calculate the force of the impact (using work-kinetic energy theorem) and add it to both of the objects, making them "bounce"
 		glm::vec3 firstPos = first->instances[firstIndex].pos;
@@ -364,12 +375,16 @@ bool separatingAxisTest(gameObject* first, gameObject* second, unsigned int firs
 		float v = first->getSpeed(firstIndex, secPos - firstPos) + second->getSpeed(secIndex, firstPos - secPos); //gets the speed at which the two instances are moving towards each other
 		float avgWeight = (first->getWeight() + second->getWeight()) / 2.0f;
 
-		float forceMag = (avgWeight * pow(v, 2)) / (2 * d);
+		float absorption = 1.0f - ((second->getSoftness()) + (first->getSoftness())) / 2.0f;
+		float force = pow((v * v * avgWeight) / 2, 0.3f) * absorption;
 
-		std::cout << 'v' << v << '\n' << 'w' << avgWeight << '\n' << 'd' << d << '\n' << 'f' << forceMag << std::endl;
+		//float force1 = abs(glm::normalize(mtvVec).y) > 0.5f && (force * 0.05f) / (first->getWeight() * 0.5f) < first->getSpeed(firstIndex, glm::vec3(0.0f, -1.0f, 0.0f)) ?
+			//-first->instances[firstIndex].currentVelocity.y : force;
+		//float force2 = abs(glm::normalize(mtvVec).y) > 0.5f && (force * 0.05f) / (second->getWeight() * 0.5f) < second->getSpeed(secIndex, glm::vec3(0.0f, -1.0f, 0.0f)) ?
+			//-first->instances[firstIndex].currentVelocity.y : force;
 
-		first->addForce(firstIndex, glm::normalize(-mtvVec), d * v * avgWeight * 15);
-		second->addForce(secIndex, glm::normalize(mtvVec), d * v * avgWeight * 15);
+		first->addForce(firstIndex, glm::normalize(-mtvVec), force * first->getBounciness());
+		second->addForce(secIndex, glm::normalize(mtvVec), force * second->getBounciness());
 	}
 #endif
 

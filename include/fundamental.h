@@ -31,6 +31,6 @@
 //#define DISABLE_INSTANCING
 //#define LEGACY_COLLISION
 //#define COLLSION_DETECTION_ONLY
-#define DISABLE_GRAVITY
+//#define DISABLE_GRAVITY
 
 extern double deltaTime;

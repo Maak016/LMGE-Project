@@ -36,12 +36,14 @@ private:
 
 	bool collidable;
 	bool isTrigger;
+	bool stationary = false;
 
 	bool physicsModelEnabled = false;
 	bool physicsAttribLoaded = false;
 
 	float objectWeight;
 	float softness;
+	float bounciness;
 
 	bool collision(std::vector<gameObject*>& all, std::vector<instance*>& outputObj, unsigned int colliderIndex);
 	void simObjectPhysics(const unsigned int instanceIndex);
@@ -84,11 +86,15 @@ public:
 
 	bool trigger();
 
-	void initializePhysicsModel(float weight, float softness);
+	void initializePhysicsModel(float weight, float softness, float bounciness);
 	bool physicsModelLoadStatus();
 	void setPhysicsModelStatus(bool state);
+	void setStationaryState(bool state);
+
 	float getWeight();
 	float getSoftness();
+	float getBounciness();
+	bool getStationaryState();
 	
 	float getSpeed(const unsigned int instanceIndex);
 	float getSpeed(const unsigned int instanceIndex, glm::vec3 dir);
