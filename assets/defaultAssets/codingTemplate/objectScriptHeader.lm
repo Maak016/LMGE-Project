@@ -1,0 +1,14 @@
+#include "fundamental.h"
+#include "gameObj.h"
+#include "shader.h"
+#include "inputSystem.h"
+
+namespace @
+{
+    extern gameObject @Obj;
+    extern model displayModel;
+    extern model colliderModel;
+
+    void initialize();
+    void update();
+}

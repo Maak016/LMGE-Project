@@ -111,6 +111,7 @@ extern std::vector<gameObject*> allObjects;
 
 namespace engine {
 	extern gameObject player;
+
 	void setupPlayerCollider();
 	void setupPlayerCollider(shader& renderShader);
 

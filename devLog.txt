@@ -73,3 +73,28 @@ Physics: PROBLEMATIC
 [15/5/26]
 Physics: Gravity simulation is more robust
 - Added a "stationary" attribute for gameObject objects. This attribute has the ability to affect the forces and translation of other colliding objects
+- Now the system is more reliable.
+
+[22/5/26]
+Rendering Mechanism: WIP
+- Adopting a different rendering mechanism of drawing to a separate Frame Buffer Object first and then applying the color buffer to a quad covering the
+screen
+- Added a new shader program consisting of fboRenderer.lmv and fboRenderer.lmf which renders the fbo's color buffer to a 2D quad covering a whole screen
+- Changes to code in main.cpp regarding the target
+- HOWEVER, the rendering mechanism is still broken and the screen shows pitch black although the clear color for the fbo is white (1.0f, 1.0f, 1.0f, 1.0f),
+suggesting possible vertex shader failure or problems in rendering procedure.
+
+[30/5/26]
+Renderring Mechanism: Postponed
+- Decision to first focus on other aspects has been made, due to the unanticipated complex issues that arose during the undertaking of the task
+
+Engine Governor: Changes made
+- Added functionality to create new files for gameObject scripts, which creates a header and a .cpp files
+- gameObject Object functions can now be grouped into one std::vector by engine::declareObjectCreation(). Every function will be run on condition that
+they are inside of the vector
+
+[2/6/26]
+Engine Governor gameObject Script Creation functionality: Enhanced
+- No part of the script file is hardcoded anymore, allowing for maximum flexibility
+- Now, in the script template, to insert the name of the object into a specific part of the file, users can leave "@" and it will automatically be replced
+with the object's name.

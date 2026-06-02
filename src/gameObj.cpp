@@ -504,7 +504,6 @@ void engine::defaultPlayerControl() {
 #endif
 }
 
-
 void engine::setupPlayerCollider(shader& renderShader) {
 	model hoomanModel("assets/defaultAssets/playerModel/model.obj");
 	player.init(hoomanModel, renderShader, nullptr, defaultPlayerControl, nullptr);

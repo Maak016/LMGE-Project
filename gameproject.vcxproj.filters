@@ -82,6 +82,8 @@
     <None Include="shaders\cubemapRenderer.lmv" />
     <None Include="shaders\lightSource.lmf" />
     <None Include="shaders\lightSource.lmv" />
+    <None Include="shaders\fboRenderer.lmf" />
+    <None Include="shaders\fboRenderer.lmv" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\scene1\backpack\ao.jpg">

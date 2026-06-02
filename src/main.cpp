@@ -31,9 +31,10 @@ void setupYes() {
 	model yesM("assets/scene2/box/box.obj");
 	yes.init(yesM, *engine::getRenderShader(), nullptr, updateYes, nullptr);
 
-	yes.initializePhysicsModel(50.0f, 0.0f, 1.0f);
+	yes.initializePhysicsModel(5.0f, 0.0f, 1.0f);
 
 	yes.instantiate(4.0f, 1.0f, -3.0f, 0.0f, 0.0f, 0.0f);
+	yes.instantiate(4.0f, 4.0f, -3.0f, 0.0f, 0.0f, 0.0f);
 }
 void setupNo() {
 	model yesM("assets/scene2/box/box.obj");
@@ -54,8 +55,11 @@ void setupYes2() {
 	yes2.instantiate(4.0f, 1.0f, 3.0f, 0.0f, 0.0f, 0.0f);
 }
 //
-
 int main() {
+	engine::fileSystem::createObjectScript(1, "anotherTestyes");
+	///
+	//OpenGL and GLFW initialization
+	///
 	if (glfwInit() != GLFW_TRUE) std::cout << "ERROR: GLFW initialization failed." << std::endl;
 	else std::cout << "SUCCESSFUL: GLFW initialization." << std::endl;
 
@@ -70,13 +74,16 @@ int main() {
 
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "ERROR: OpenGL Loader failed." << std::endl;
+		std::cout << "ERROR: OpenGL Library Loader failed." << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	else std::cout << "SUCCESSFUL: OpenGL Loader." << std::endl;
+	else std::cout << "SUCCESSFUL: OpenGL Library Loader." << std::endl;
 	std::cout << std::endl;
 
+	///
+	//Run-time dependencies and attributes (buffers, shaders, etc.)
+	///
 	unsigned int matricesBlock;
 	glGenBuffers(1, &matricesBlock);
 	glBindBuffer(GL_UNIFORM_BUFFER, matricesBlock);
@@ -106,36 +113,36 @@ int main() {
 	skybox normSkybox;
 	normSkybox.init("assets/defaultAssets/skybox", ".jpg");
 
-	setupYes();
-	setupNo();
-	setupYes2();
+	engine::declareGameObjectCreation(setupYes);
+	engine::declareGameObjectCreation(setupNo);
+	engine::declareGameObjectCreation(setupYes2);
 
+	//lighting and matrices (shader related stuff)
 	glm::mat4 projectionMatrix = glm::mat4(1.0f);
 	projectionMatrix = glm::perspective(FOV, (float)scrWidth / (float)scrHeight, 0.1f, 100.0f);
-
-	//runs the one time initialization code of each gameObject object.
-	for (int i = 0; i < allObjects.size(); i++) allObjects[i]->runtimeInit();
-
 	glm::vec3 dirLightV = glm::normalize(glm::vec3(1.0f, 1.5f, 0.5f));
 	lightSource dir(glm::vec3(0.0f, 0.0f, 0.0f), dirLightV, glm::vec3(1.0f, 1.0f, 1.0f), 0.3f);
 	lightSource point(glm::vec3(-5.5f, 1.5f, -0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 0.5f);
 	point.visualize(true);
-	dir.visualize(true);
 
-	glfwSetTime(0);
+	//gameObject procession
+	engine::loadScene();
+
+	//runs the one time initialization code of each gameObject object.
+	for (int i = 0; i < allObjects.size(); i++) allObjects[i]->runtimeInit();
 
 	glEnable(GL_DEPTH_TEST);
-
 #ifndef LEGACY_INPUT_SYSTEM
 	input::init(mainWindow);
 #endif
+
+	glfwSetTime(0);
 	while (!glfwWindowShouldClose(mainWindow)) {
 		if (engine::engineTerminated()) {
 			std::cout << std::endl;
 			std::cout << "ERROR: LMGE: ENGINE TERMINATED." << std::endl;
 			return -1;
 		}
-
 		currentTime = glfwGetTime();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

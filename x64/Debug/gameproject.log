@@ -1,5 +1,5 @@
 ﻿  main.cpp
-D:\Visual Studio projects\gameproject\gameproject\include\engineGovernor.h(12,18): warning C4305: 'initializing': truncation from 'double' to 'float'
+D:\Visual Studio projects\gameproject\gameproject\include\engineGovernor.h(22,16): warning C4305: 'initializing': truncation from 'double' to 'float'
   (compiling source file 'src/main.cpp')
   
   gameproject.vcxproj -> D:\Visual Studio projects\gameproject\x64\Debug\gameproject.exe

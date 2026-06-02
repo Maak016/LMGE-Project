@@ -1,0 +1,11 @@
+#include "@.h"
+
+//Called once before the first frame to setup the object
+void @::initialize(){
+
+}
+
+//Code to define the behavior of game object while the game runs (will be called each frame)
+void @::update(){
+
+}
